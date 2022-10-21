@@ -1,3 +1,3 @@
-package article
+package domain
 
 // domain Article

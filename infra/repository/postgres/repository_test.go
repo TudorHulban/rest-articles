@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/TudorHulban/rest-articles/domain/article"
+	domain "github.com/TudorHulban/rest-articles/domain/article"
 	"github.com/TudorHulban/rest-articles/infra/db"
 	"github.com/stretchr/testify/require"
 )
@@ -22,7 +22,7 @@ func TestRepository(t *testing.T) {
 
 	noID := 8
 
-	item := article.Article{
+	item := domain.Article{
 		ID:        noID,
 		Title:     "The Title " + strconv.Itoa(noID),
 		URL:       "The URL",

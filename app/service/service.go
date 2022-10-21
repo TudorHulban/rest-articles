@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/TudorHulban/rest-articles/domain/article"
+	domain "github.com/TudorHulban/rest-articles/domain/article"
 	"github.com/TudorHulban/rest-articles/infra/db"
 	repository "github.com/TudorHulban/rest-articles/infra/repository/postgres"
 	"github.com/asaskevich/govalidator"
@@ -38,7 +38,7 @@ func (s *Service) CreateArticle(ctx context.Context, params *ParamsCreateArticle
 	}
 	defer tx.Rollback()
 
-	item := article.Article{
+	item := domain.Article{
 		Title:     params.Title,
 		URL:       params.URL,
 		CreatedOn: time.Now(),
@@ -55,7 +55,7 @@ func (s *Service) CreateArticle(ctx context.Context, params *ParamsCreateArticle
 	return item.ID, nil
 }
 
-func (s *Service) GetArticle(ctx context.Context, id int) (*article.Article, error) {
+func (s *Service) GetArticle(ctx context.Context, id int) (*domain.Article, error) {
 	article, errFind := s.repo.Find(ctx, id)
 	switch {
 	case errFind == nil:
@@ -69,7 +69,7 @@ func (s *Service) GetArticle(ctx context.Context, id int) (*article.Article, err
 	}
 }
 
-func (s *Service) GetArticles(ctx context.Context) (*article.Articles, error) {
+func (s *Service) GetArticles(ctx context.Context) (*domain.Articles, error) {
 	articles, errAll := s.repo.FindAll(ctx)
 	switch {
 	case errAll == nil:

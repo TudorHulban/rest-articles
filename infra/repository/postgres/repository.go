@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/TudorHulban/rest-articles/domain/article"
+	domain "github.com/TudorHulban/rest-articles/domain/article"
 	"github.com/TudorHulban/rest-articles/infra/db"
 	"github.com/jmoiron/sqlx"
 )
@@ -24,7 +24,7 @@ func NewRepository(db *sqlx.DB) (*Repository, error) {
 	}, nil
 }
 
-func (repo *Repository) Create(ctx context.Context, item *article.Article) error {
+func (repo *Repository) Create(ctx context.Context, item *domain.Article) error {
 	query := `INSERT INTO articles (title, url, created_on)
 	VALUES (:title, :url, :created_on) RETURNING id;`
 
@@ -43,8 +43,8 @@ func (repo *Repository) Create(ctx context.Context, item *article.Article) error
 	return nil
 }
 
-func (repo *Repository) Find(ctx context.Context, id int) (*article.Article, error) {
-	var item article.Article
+func (repo *Repository) Find(ctx context.Context, id int) (*domain.Article, error) {
+	var item domain.Article
 
 	query := fmt.Sprintf(
 		"SELECT * FROM articles WHERE id = $1 AND deleted_on IS NULL",
@@ -55,8 +55,8 @@ func (repo *Repository) Find(ctx context.Context, id int) (*article.Article, err
 	return &item, db.HandleError(errDB)
 }
 
-func (repo *Repository) FindAll(ctx context.Context) (*article.Articles, error) {
-	var items article.Articles
+func (repo *Repository) FindAll(ctx context.Context) (*domain.Articles, error) {
+	var items domain.Articles
 
 	query := fmt.Sprintf(
 		"SELECT * FROM articles WHERE deleted_on IS NULL",
@@ -67,7 +67,7 @@ func (repo *Repository) FindAll(ctx context.Context) (*article.Articles, error) 
 	return &items, db.HandleError(errDB)
 }
 
-func (repo *Repository) Update(ctx context.Context, item *article.Article) error {
+func (repo *Repository) Update(ctx context.Context, item *domain.Article) error {
 	query := `UPDATE articles
                 SET title = :title, 
                     url = :url, 
