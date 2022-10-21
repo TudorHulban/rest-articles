@@ -1,0 +1,3 @@
+package article
+
+// domain Article

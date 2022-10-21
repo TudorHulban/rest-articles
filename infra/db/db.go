@@ -15,6 +15,16 @@ type ConfigDB struct {
 	Port     int
 }
 
+func NewTestConfigDB() ConfigDB {
+	return ConfigDB{
+		Name:     "rest",
+		User:     "postgres",
+		Password: "thepassword",
+		Host:     "localhost",
+		Port:     5432,
+	}
+}
+
 func Connect(cfg ConfigDB) (*sqlx.DB, error) {
 	dsn := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
