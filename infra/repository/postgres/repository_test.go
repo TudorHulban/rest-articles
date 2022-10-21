@@ -39,7 +39,7 @@ func TestRepository(t *testing.T) {
 
 	articles, errAll := repo.FindAll(ctx)
 	require.NoError(t, errAll)
-	require.GreaterOrEqual(t, len(articles), 2)
+	require.GreaterOrEqual(t, len(*articles), 2)
 
 	fmt.Println(articles)
 

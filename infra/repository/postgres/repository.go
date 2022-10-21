@@ -55,7 +55,7 @@ func (repo *Repository) Find(ctx context.Context, id int) (*article.Article, err
 	return &item, db.HandleError(errDB)
 }
 
-func (repo *Repository) FindAll(ctx context.Context) (article.Articles, error) {
+func (repo *Repository) FindAll(ctx context.Context) (*article.Articles, error) {
 	var items article.Articles
 
 	query := fmt.Sprintf(
@@ -64,7 +64,7 @@ func (repo *Repository) FindAll(ctx context.Context) (article.Articles, error) {
 
 	errDB := repo.Db.SelectContext(ctx, &items, query)
 
-	return items, db.HandleError(errDB)
+	return &items, db.HandleError(errDB)
 }
 
 func (repo *Repository) Update(ctx context.Context, item *article.Article) error {
