@@ -12,7 +12,7 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=thepassword
-      - POSTGRES_HOST_AUTH_METHOD=trust
+      # - POSTGRES_HOST_AUTH_METHOD=trust 
     volumes:
       - ../.database/postgres/data:/var/lib/postgresql/data
       - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -39,8 +39,8 @@ services:
   migrate:
     image: migrate/migrate
     volumes:
-      - .:/migrations
-    command: ["-path", "/migrations", "-database",  "postgres://postgres:thepassword@cn_rest_db:5432/rest?sslmode=disable", "up", "1"]
+      - ./migrations:/migrations
+    command: ["-path", "/migrations", "-database",  "postgres://postgres:thepassword@cn_rest_db:5432/rest?sslmode=disable", "up", "2"]
     links: 
       - db
     networks:
