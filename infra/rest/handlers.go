@@ -8,6 +8,14 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+func (s *WebServer) handleAlive() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		return c.Status(http.StatusOK).JSON(&fiber.Map{
+			"alive": true,
+		})
+	}
+}
+
 func (s *WebServer) handleNewArticle() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		type request struct {

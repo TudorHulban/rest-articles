@@ -1,29 +1,19 @@
 # rest-articles
 ## Prerequisites
-Postgresql client:
-```sh
-sudo apt-get install postgresql-client
-# or
-sudo apt install postgresql-client-common
-```
+### Docker ( Compose )
 ## Infrastructure
-a. create Docker container
+Use below command to create infrastructure:
 ```sh
-sudo docker run -d --name=co-postgres -p 5432:5432  -e POSTGRES_PASSWORD=thepassword postgres
+make infra
 ```
-b. create database `rest` (with DBeaver)
-c. export Postgres connection
+## Test Go Docker file
+### Create Docker image
 ```sh
-export POSTGRESQL_URL='postgres://postgres:thepassword@localhost:5432/rest?sslmode=disable'
+sudo docker build -t goapp .
 ```
-## Database Migrations
-create migrations
+### Create container from the Docker image created
 ```sh
-migrate create -ext sql -dir migrations -seq create_articles_table
-```
-run migrations
-```sh
-
+sudo docker run -d --name=co-goapp -p 3000:3000 goapp
 ```
 
 ## Resources

@@ -16,7 +16,10 @@ type WebServer struct {
 	port        uint
 }
 
-const _route = "/api/v1/article"
+const (
+	_routeArticle = "/api/v1/article"
+	_routeAlive   = "/"
+)
 
 func NewWebServer(port uint) *WebServer {
 	return &WebServer{
@@ -26,13 +29,16 @@ func NewWebServer(port uint) *WebServer {
 }
 
 func (s *WebServer) addRoutes() {
-	s.app.Post(_route, s.handleNewArticle())
-	s.app.Get(_route+"/:id", s.handleGetArticle())
-	s.app.Get(_route, s.handleGetArticles())
+	s.app.Post(_routeArticle, s.handleNewArticle())
+	s.app.Get(_routeArticle+"/:id", s.handleGetArticle())
+	s.app.Get(_routeArticle, s.handleGetArticles())
+	s.app.Get(_routeAlive, s.handleAlive())
 }
 
 func (s *WebServer) Start() {
 	s.addRoutes()
+
+	fmt.Println("web server started")
 
 	s.errShutdown = s.app.Listen(":" + strconv.Itoa(int(s.port)))
 }
