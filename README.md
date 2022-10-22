@@ -28,5 +28,6 @@ run migrations
 
 ## Resources
 ```html
+https://www.baeldung.com/ops/docker-compose
 https://firehydrant.com/blog/develop-a-go-app-with-docker-compose/
 ```

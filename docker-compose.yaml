@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 
 networks:
   connector.ex:
@@ -12,9 +12,10 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=thepassword
+      - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
       - ../.database/postgres/data:/var/lib/postgresql/data
-      - ../db/init.sql:/docker-entrypoint-initdb.d/create_database.sql
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - 5432:5432
     networks:
