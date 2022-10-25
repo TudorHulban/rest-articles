@@ -41,6 +41,14 @@ func (s *WebServer) Start() {
 	fmt.Println("web server started")
 
 	s.errShutdown = s.app.Listen(":" + strconv.Itoa(int(s.port)))
+
+	if s.errShutdown != nil {
+		fmt.Printf("start - stopped now: %w\n", s.errShutdown)
+
+		return
+	}
+
+	fmt.Println("start - stopped now: no error")
 }
 
 func (s *WebServer) Stop() {

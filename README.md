@@ -1,4 +1,14 @@
 # rest-articles
+## Unit testing
+### Docker Postgres
+```sh
+sudo docker run -d --name=co-postgres -p 5432:5432 -e POSTGRES_PASSWORD=thepassword postgres
+```
+### Database Objects
+Run migrations:
+```sh
+migrate -path migrations/ -database postgres://postgres:thepassword@127.0.0.1:5432/rest?sslmode=disable -verbose up 2
+```
 ## Prerequisites
 ### Docker ( Compose )
 ## Infrastructure
@@ -15,6 +25,7 @@ sudo docker build -t goapp .
 ```sh
 sudo docker run -d --name=co-goapp -p 3000:3000 goapp
 ```
+
 
 ## Resources
 ```html

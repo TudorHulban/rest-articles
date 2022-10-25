@@ -13,7 +13,7 @@ import (
 )
 
 func TestRepository(t *testing.T) {
-	db, errCo := db.Connect(db.NewTestConfigDB())
+	db, errCo := db.GetDBConnection()
 	require.NoError(t, errCo)
 	require.NotNil(t, db)
 

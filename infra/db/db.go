@@ -7,7 +7,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type ConfigDB struct {
+type configDB struct {
 	Name     string
 	User     string
 	Password string
@@ -15,8 +15,8 @@ type ConfigDB struct {
 	Port     int
 }
 
-func NewTestConfigDB() ConfigDB {
-	return ConfigDB{
+func newTestConfigDB() configDB {
+	return configDB{
 		Name:     "rest",
 		User:     "postgres",
 		Password: "thepassword",
@@ -25,7 +25,7 @@ func NewTestConfigDB() ConfigDB {
 	}
 }
 
-func Connect(cfg ConfigDB) (*sqlx.DB, error) {
+func connect(cfg configDB) (*sqlx.DB, error) {
 	dsn := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		cfg.Host,

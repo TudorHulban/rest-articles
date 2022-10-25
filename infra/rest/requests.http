@@ -1,0 +1,7 @@
+POST http://localhost:3000/api/v1/article HTTP/1.1
+content-type: application/json
+
+{
+    "title": "Title 1",
+    "url": "htttp://blog.eu/article1"
+}
