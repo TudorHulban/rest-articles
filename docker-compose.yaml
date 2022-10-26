@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.9'
 
 networks:
   connector.ex:
@@ -6,6 +6,7 @@ networks:
 
 services:
   db:
+    profiles: ["migrations", "run", "unittest"]
     restart: always
     image: postgres:latest
     container_name: cn_rest_db
@@ -22,8 +23,8 @@ services:
       - connector.ex
 
   rest:
-    build: 
-      dockerfile: Dockerfile_GoApp
+    profiles: ["run"]
+    build: .
     container_name: cn_rest
     command: /app/main
     ports:
@@ -34,6 +35,7 @@ services:
       - connector.ex
 
   migrate:
+    profiles: ["migrations", "unittest"]
     image: migrate/migrate
     volumes:
       - ./migrations:/migrations

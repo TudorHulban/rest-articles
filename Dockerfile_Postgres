@@ -1,3 +1,0 @@
-FROM postgres:15
-
-COPY start.sh /docker-entrypoint-initdb.d/start.sh

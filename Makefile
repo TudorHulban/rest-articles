@@ -18,6 +18,6 @@ migrate-down:
 	migrate -path db/migration -database ${db} -verbose down
 
 # Database Related
-.PHONY: database
-database:
-	@docker build - < Dockerfile_Postgres -t database
+.PHONY: database-unit
+database-unit:
+	@docker-compose  --profile unittest  up
