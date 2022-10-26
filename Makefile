@@ -16,3 +16,8 @@ migrate-up:
 
 migrate-down:
 	migrate -path db/migration -database ${db} -verbose down
+
+# Database Related
+.PHONY: database
+database:
+	@docker build - < Dockerfile_Postgres -t database

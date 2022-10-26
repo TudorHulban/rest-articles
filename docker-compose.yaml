@@ -22,7 +22,8 @@ services:
       - connector.ex
 
   rest:
-    build: .
+    build: 
+      dockerfile: Dockerfile_GoApp
     container_name: cn_rest
     command: /app/main
     ports:

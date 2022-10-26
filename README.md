@@ -1,6 +1,10 @@
 # rest-articles
 ## Unit testing
 ### Docker Postgres
+### Create Docker image
+```sh
+docker build - < Dockerfile_Postgres -t database
+```
 ```sh
 sudo docker run -d --name=co-postgres -p 5432:5432 -e POSTGRES_PASSWORD=thepassword postgres
 ```
@@ -19,7 +23,7 @@ make infra
 ## Test Go Docker file
 ### Create Docker image
 ```sh
-sudo docker build -t goapp .
+sudo docker build -t goapp Dockerfile_GoApp
 ```
 ### Create container from the Docker image created
 ```sh
@@ -31,4 +35,5 @@ sudo docker run -d --name=co-goapp -p 3000:3000 goapp
 ```html
 https://www.baeldung.com/ops/docker-compose
 https://firehydrant.com/blog/develop-a-go-app-with-docker-compose/
+https://stackoverflow.com/questions/52115178/create-a-database-then-table-with-dockerfile
 ```
