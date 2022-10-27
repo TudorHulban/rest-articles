@@ -1,10 +1,11 @@
 package db
 
 import (
-	"database/sql"
 	"fmt"
 
 	_ "github.com/lib/pq"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 type configDB struct {
@@ -25,7 +26,7 @@ func newTestConfigDB() configDB {
 	}
 }
 
-func connect(cfg configDB) (*sql.DB, error) {
+func connect(cfg configDB) (*gorm.DB, error) {
 	dsn := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		cfg.Host,
@@ -35,5 +36,5 @@ func connect(cfg configDB) (*sql.DB, error) {
 		cfg.Name,
 	)
 
-	return sql.Open("postgres", dsn)
+	return gorm.Open(postgres.Open(dsn), &gorm.Config{})
 }

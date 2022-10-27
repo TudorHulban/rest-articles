@@ -9,7 +9,7 @@ import (
 type Article struct {
 	Title string `db:"title"`
 	URL   string `db:"url"`
-	ID    int    `db:"id"`
+	ID    int64  `db:"id"`
 
 	CreatedOn time.Time  `db:"created_on"`
 	UpdatedOn *time.Time `db:"updated_on"`

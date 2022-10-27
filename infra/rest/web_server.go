@@ -21,10 +21,11 @@ const (
 	_routeAlive   = "/"
 )
 
-func NewWebServer(port uint) *WebServer {
+func NewWebServer(port uint, service *service.Service) *WebServer {
 	return &WebServer{
 		app:  fiber.New(),
 		port: port,
+		serv: service,
 	}
 }
 

@@ -27,16 +27,10 @@ type ParamsCreateArticle struct {
 	URL   string `valid:"required"`
 }
 
-func (s *Service) CreateArticle(ctx context.Context, params *ParamsCreateArticle) (int, error) {
+func (s *Service) CreateArticle(ctx context.Context, params *ParamsCreateArticle) (int64, error) {
 	if _, errVa := govalidator.ValidateStruct(params); errVa != nil {
 		return 0, fmt.Errorf(errorArgumentMessage, errVa)
 	}
-
-	tx, errTx := s.repo.Db.BeginTxx(ctx, nil)
-	if errTx != nil {
-		return 0, errTx
-	}
-	defer tx.Rollback()
 
 	item := domain.Article{
 		Title:     params.Title,
@@ -44,18 +38,15 @@ func (s *Service) CreateArticle(ctx context.Context, params *ParamsCreateArticle
 		CreatedOn: time.Now(),
 	}
 
-	if errCr := s.repo.Create(ctx, &item); errCr != nil {
-		return 0, errCr
+	itemID, errCr := s.repo.Create(ctx, &item)
+	if errCr != nil {
+		return 0, fmt.Errorf("CreateArticle: %w", errCr)
 	}
 
-	if errCo := tx.Commit(); errCo != nil {
-		return 0, errCo
-	}
-
-	return item.ID, nil
+	return itemID, nil
 }
 
-func (s *Service) GetArticle(ctx context.Context, id int) (*domain.Article, error) {
+func (s *Service) GetArticle(ctx context.Context, id int64) (*domain.Article, error) {
 	article, errFind := s.repo.Find(ctx, id)
 	switch {
 	case errFind == nil:
@@ -84,7 +75,7 @@ func (s *Service) GetArticles(ctx context.Context) (*domain.Articles, error) {
 }
 
 type ParamsUpdateArticle struct {
-	ID    int `valid:"required"`
+	ID    int64 `valid:"required"`
 	Title *string
 	URL   *string
 }
@@ -107,38 +98,17 @@ func (s *Service) UpdateArticle(ctx context.Context, params *ParamsUpdateArticle
 		article.URL = *params.URL
 	}
 
-	tx, errTx := s.repo.Db.BeginTxx(ctx, nil)
-	if errTx != nil {
-		return errTx
-	}
-	defer tx.Rollback()
-
-	if errDB = s.repo.Update(ctx, article); errDB != nil {
-		return errDB
-	}
-
-	return tx.Commit()
+	return s.repo.Update(ctx, article)
 }
 
-func (s *Service) Delete(ctx context.Context, id int) error {
+func (s *Service) Delete(ctx context.Context, id int64) error {
 	article, errDB := s.repo.Find(ctx, id)
 	if errDB != nil {
 		return errDB
 	}
 
-	tx, errTx := s.repo.Db.BeginTxx(ctx, nil)
-	if errTx != nil {
-		return errTx
-	}
-	defer tx.Rollback()
-
 	now := time.Now()
 	article.DeletedOn = &now
 
-	errUpd := s.repo.Update(ctx, article)
-	if errUpd != nil {
-		return errUpd
-	}
-
-	return tx.Commit()
+	return s.repo.Update(ctx, article)
 }

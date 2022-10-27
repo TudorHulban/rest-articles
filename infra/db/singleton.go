@@ -1,14 +1,15 @@
 package db
 
 import (
-	"database/sql"
 	"sync"
+
+	"gorm.io/gorm"
 )
 
-var _dbConnection *sql.DB
+var _dbConnection *gorm.DB
 var mu sync.RWMutex
 
-func GetDBConnection() (*sql.DB, error) {
+func GetDBConnection() (*gorm.DB, error) {
 	mu.RLock()
 	if _dbConnection != nil {
 		defer mu.RUnlock()

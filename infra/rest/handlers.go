@@ -69,7 +69,7 @@ func (s *WebServer) handleGetArticle() fiber.Handler {
 			})
 		}
 
-		reconstructedItem, errFetch := s.serv.GetArticle(context.Background(), idItem)
+		reconstructedItem, errFetch := s.serv.GetArticle(context.Background(), int64(idItem))
 		if errFetch != nil {
 			return c.Status(http.StatusInternalServerError).JSON(&fiber.Map{
 				"success": false,
