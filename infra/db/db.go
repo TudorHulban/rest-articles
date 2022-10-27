@@ -1,9 +1,9 @@
 package db
 
 import (
+	"database/sql"
 	"fmt"
 
-	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
 
@@ -25,7 +25,7 @@ func newTestConfigDB() configDB {
 	}
 }
 
-func connect(cfg configDB) (*sqlx.DB, error) {
+func connect(cfg configDB) (*sql.DB, error) {
 	dsn := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		cfg.Host,
@@ -35,5 +35,5 @@ func connect(cfg configDB) (*sqlx.DB, error) {
 		cfg.Name,
 	)
 
-	return sqlx.Connect("postgres", dsn)
+	return sql.Open("postgres", dsn)
 }

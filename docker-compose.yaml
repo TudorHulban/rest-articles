@@ -12,8 +12,7 @@ services:
     container_name: cn_rest_db
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=thepassword
-      # - POSTGRES_HOST_AUTH_METHOD=trust 
+      - POSTGRES_HOST_AUTH_METHOD=trust 
     volumes:
       - ../.database/postgres/data:/var/lib/postgresql/data
       - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql

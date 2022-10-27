@@ -20,22 +20,20 @@ func TestRepository(t *testing.T) {
 	repo, errRepo := NewRepository(db)
 	require.NoError(t, errRepo)
 
-	noID := 8
-
 	item := domain.Article{
-		ID:        noID,
-		Title:     "The Title " + strconv.Itoa(noID),
+		Title:     "The Title " + strconv.Itoa(int(time.Now().Unix())),
 		URL:       "The URL",
 		CreatedOn: time.Now(),
 	}
 
 	ctx := context.Background()
 
-	require.NoError(t, repo.Create(ctx, &item), "insert issues")
+	insertID, errInsert := repo.Create(ctx, &item)
+	require.NoError(t, errInsert, "insert issues")
 
-	reconstructedArticle, errFind := repo.Find(ctx, noID)
-	require.NoError(t, errFind)
-	require.Equal(t, noID, reconstructedArticle.ID)
+	reconstructedArticle, errFind := repo.Find(ctx, insertID)
+	require.NoError(t, errFind, errFind)
+	require.Equal(t, insertID, reconstructedArticle.ID)
 
 	articles, errAll := repo.FindAll(ctx)
 	require.NoError(t, errAll)

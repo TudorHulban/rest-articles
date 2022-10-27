@@ -36,4 +36,5 @@ sudo docker run -d --name=co-goapp -p 3000:3000 goapp
 https://www.baeldung.com/ops/docker-compose
 https://firehydrant.com/blog/develop-a-go-app-with-docker-compose/
 https://stackoverflow.com/questions/52115178/create-a-database-then-table-with-dockerfile
+https://golangbot.com/mysql-create-table-insert-row/
 ```

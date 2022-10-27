@@ -1,15 +1,14 @@
 package db
 
 import (
+	"database/sql"
 	"sync"
-
-	"github.com/jmoiron/sqlx"
 )
 
-var _dbConnection *sqlx.DB
+var _dbConnection *sql.DB
 var mu sync.RWMutex
 
-func GetDBConnection() (*sqlx.DB, error) {
+func GetDBConnection() (*sql.DB, error) {
 	mu.RLock()
 	if _dbConnection != nil {
 		defer mu.RUnlock()
