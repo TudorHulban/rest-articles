@@ -37,6 +37,9 @@ func NewWebServer(port uint, service *service.Service) (*WebServer, error) {
 func (s *WebServer) addRoutes() {
 	s.app.Post(_routeArticle, s.handleNewArticle())
 	s.app.Get(_routeArticle+"/:id", s.handleGetArticle())
+	s.app.Put(_routeArticle, s.handleUpdateArticle())
+	s.app.Delete(_routeArticle+"/:id", s.handleDeleteArticle())
+
 	s.app.Get(_routeArticle, s.handleGetArticles())
 	s.app.Get(_routeAlive, s.handleAlive())
 }

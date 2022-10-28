@@ -79,12 +79,92 @@ func (s *WebServer) handleGetArticle() fiber.Handler {
 
 		return c.Status(http.StatusOK).JSON(&fiber.Map{
 			"success": true,
-			"company": reconstructedItem,
+			"article": reconstructedItem,
 		})
 	}
 }
 
 // handleGetArticles - no pagination
 func (s *WebServer) handleGetArticles() fiber.Handler {
-	return func(c *fiber.Ctx) error { return nil }
+	return func(c *fiber.Ctx) error {
+		articles, errReq := s.serv.GetArticles(context.Background())
+		if errReq != nil {
+			return c.Status(http.StatusInternalServerError).JSON(&fiber.Map{
+				"success": false,
+				"error":   errReq.Error(),
+			})
+		}
+
+		return c.Status(http.StatusOK).JSON(&fiber.Map{
+			"success":  true,
+			"articles": articles,
+		})
+	}
+}
+
+func (s *WebServer) handleUpdateArticle() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		type request struct {
+			ID    int64  `json:"id"`
+			Title string `json:"title"`
+			URL   string `json:"url"`
+		}
+
+		var req request
+
+		if errBody := c.BodyParser(&req); errBody != nil {
+			return c.Status(http.StatusBadRequest).JSON(&fiber.Map{
+				"success": false,
+				"error":   errBody.Error(),
+			})
+		}
+
+		params := service.ParamsUpdateArticle{
+			ID:    req.ID,
+			Title: &req.Title,
+			URL:   &req.URL,
+		}
+
+		if errUpd := s.serv.UpdateArticle(context.Background(), &params); errUpd != nil {
+			return c.Status(http.StatusBadRequest).JSON(&fiber.Map{
+				"success": false,
+				"error":   errUpd.Error(),
+			})
+		}
+
+		return c.Status(http.StatusOK).JSON(&fiber.Map{
+			"success": true,
+		})
+	}
+}
+
+func (s *WebServer) handleDeleteArticle() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		idRequest := c.Params("id")
+		idItem, errReq := strconv.Atoi(idRequest)
+		if errReq != nil {
+			return c.Status(http.StatusBadRequest).JSON(&fiber.Map{
+				"success": false,
+				"error":   errReq.Error(),
+			})
+		}
+
+		if idItem < 1 {
+			return c.Status(http.StatusBadRequest).JSON(&fiber.Map{
+				"success": false,
+				"error":   "ID should be at least 1",
+			})
+		}
+
+		if errDel := s.serv.DeleteArticle(context.Background(), int64(idItem)); errDel != nil {
+			return c.Status(http.StatusBadRequest).JSON(&fiber.Map{
+				"success": false,
+				"error":   errDel.Error(),
+			})
+		}
+
+		return c.Status(http.StatusOK).JSON(&fiber.Map{
+			"success": true,
+		})
+	}
 }

@@ -105,7 +105,7 @@ func (s *Service) UpdateArticle(ctx context.Context, params *ParamsUpdateArticle
 	return s.repo.Update(ctx, article)
 }
 
-func (s *Service) Delete(ctx context.Context, id int64) error {
+func (s *Service) DeleteArticle(ctx context.Context, id int64) error {
 	article, errDB := s.repo.Find(ctx, id)
 	if errDB != nil {
 		return errDB

@@ -6,7 +6,7 @@ networks:
 
 services:
   db:
-    profiles: ["migrations", "run", "unittest"]
+    profiles: ["run", "unittest"]
     restart: always
     image: postgres:latest
     container_name: cn_rest_db
@@ -15,7 +15,6 @@ services:
       - POSTGRES_HOST_AUTH_METHOD=trust 
     volumes:
       - ../.database/postgres/data:/var/lib/postgresql/data
-      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - 5432:5432
     networks:
@@ -25,21 +24,13 @@ services:
     profiles: ["run"]
     build: .
     container_name: cn_rest
+    environment:
+      - POSTGRES_DATABASE=rest
     command: /app/main
     ports:
       - 3000:3000
-    # depends_on:
-    #   - db
-    networks:
-      - connector.ex
-
-  migrate:
-    profiles: ["migrations", "unittest"]
-    image: migrate/migrate
-    volumes:
-      - ./migrations:/migrations
-    command: ["-path", "/migrations", "-database",  "postgres://postgres:thepassword@cn_rest_db:5432/rest?sslmode=disable", "up", "2"]
-    links: 
+    depends_on:
       - db
     networks:
       - connector.ex
+
