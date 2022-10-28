@@ -102,6 +102,9 @@ func (s *Service) UpdateArticle(ctx context.Context, params *ParamsUpdateArticle
 		article.URL = *params.URL
 	}
 
+	now := time.Now()
+	article.UpdatedOn = &now
+
 	return s.repo.Update(ctx, article)
 }
 
