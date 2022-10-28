@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 
@@ -21,12 +22,16 @@ const (
 	_routeAlive   = "/"
 )
 
-func NewWebServer(port uint, service *service.Service) *WebServer {
+func NewWebServer(port uint, service *service.Service) (*WebServer, error) {
+	if service == nil {
+		return nil, errors.New("passed service is nil")
+	}
+
 	return &WebServer{
 		app:  fiber.New(),
 		port: port,
 		serv: service,
-	}
+	}, nil
 }
 
 func (s *WebServer) addRoutes() {

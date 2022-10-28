@@ -24,7 +24,8 @@ func TestCreateArticle(t *testing.T) {
 	repo, errRepo := repository.NewRepository(db)
 	require.NoError(t, errRepo)
 
-	serv := NewService(repo)
+	serv, errServ := NewService(repo)
+	require.NoError(t, errServ)
 
 	rowID, errCr := serv.CreateArticle(ctx, &params)
 	require.NoError(t, errCr)

@@ -30,8 +30,17 @@ func main() {
 		os.Exit(3)
 	}
 
-	service := service.NewService(repo)
+	service, errServ := service.NewService(repo)
+	if errServ != nil {
+		fmt.Printf("service creation: %s", errServ)
+		os.Exit(4)
+	}
 
-	web := rest.NewWebServer(3000, service)
+	web, errWeb := rest.NewWebServer(3000, service)
+	if errWeb != nil {
+		fmt.Printf("web server creation: %s", errWeb)
+		os.Exit(5)
+	}
+
 	web.Start()
 }

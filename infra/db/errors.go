@@ -9,7 +9,7 @@ import (
 // yielded no result. Declared as type, not value, for consistency reasons.
 type ErrObjectNotFound struct{}
 
-const errObjectNotFoundMessage = "object not found"
+const errObjectNotFoundMessage = "record not found"
 
 func (ErrObjectNotFound) Error() string {
 	return errObjectNotFoundMessage

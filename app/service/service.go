@@ -16,10 +16,14 @@ type Service struct {
 	repo repository.Repository
 }
 
-func NewService(repo *repository.Repository) *Service {
+func NewService(repo *repository.Repository) (*Service, error) {
+	if repo == nil {
+		return nil, errors.New("passed repository is nil")
+	}
+
 	return &Service{
 		repo: *repo,
-	}
+	}, nil
 }
 
 type ParamsCreateArticle struct {

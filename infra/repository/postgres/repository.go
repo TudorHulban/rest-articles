@@ -37,13 +37,20 @@ func (repo *Repository) Create(ctx context.Context, item *domain.Article) (int64
 func (repo *Repository) Find(ctx context.Context, id int64) (*domain.Article, error) {
 	var item domain.Article
 
-	rows := repo.DBConn.First(&item, id).RowsAffected
+	tx := repo.DBConn.First(&item, id)
+	if tx.Error != nil {
+		if tx.Error.Error() == "record not found" {
+			return nil, db.ErrObjectNotFound{}
+		}
 
-	if rows == 1 {
+		return nil, tx.Error
+	}
+
+	if tx.RowsAffected == 1 {
 		return &item, nil
 	}
 
-	return nil, db.ErrObjectNotFound{}
+	return nil, fmt.Errorf("duplicates found for ID: %d", id)
 }
 
 func (repo *Repository) FindAll(ctx context.Context) (*domain.Articles, error) {
