@@ -1,24 +1,17 @@
 version: '3.9'
 
-networks:
-  connector.ex:
-    driver: bridge
-
 services:
   db:
     profiles: ["run", "unittest"]
     restart: always
-    image: postgres:latest
+    image: postgres:15-alpine
     container_name: cn_rest_db
     environment:
+      - POSTGRES_DB=rest
       - POSTGRES_USER=postgres
       - POSTGRES_HOST_AUTH_METHOD=trust 
-    volumes:
-      - ../.database/postgres/data:/var/lib/postgresql/data
     ports:
       - 5432:5432
-    networks:
-      - connector.ex
 
   rest:
     profiles: ["run"]
@@ -31,6 +24,3 @@ services:
       - 3000:3000
     depends_on:
       - db
-    networks:
-      - connector.ex
-

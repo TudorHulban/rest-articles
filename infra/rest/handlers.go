@@ -54,6 +54,7 @@ func (s *WebServer) handleNewArticle() fiber.Handler {
 func (s *WebServer) handleGetArticle() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		idRequest := c.Params("id")
+
 		idItem, errReq := strconv.Atoi(idRequest)
 		if errReq != nil {
 			return c.Status(http.StatusBadRequest).JSON(&fiber.Map{
@@ -104,15 +105,17 @@ func (s *WebServer) handleGetArticles() fiber.Handler {
 
 func (s *WebServer) handleUpdateArticle() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		type request struct {
+		type Request struct {
 			ID    int64  `json:"id"`
 			Title string `json:"title"`
 			URL   string `json:"url"`
 		}
 
-		var req request
+		var req Request
 
 		if errBody := c.BodyParser(&req); errBody != nil {
+			c.Body()
+
 			return c.Status(http.StatusBadRequest).JSON(&fiber.Map{
 				"success": false,
 				"error":   errBody.Error(),

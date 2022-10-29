@@ -18,8 +18,8 @@ type WebServer struct {
 }
 
 const (
-	_routeArticle = "/api/v1/article"
-	_routeAlive   = "/"
+	_routeItem  = "/api/v1/article"
+	_routeAlive = "/"
 )
 
 func NewWebServer(port uint, service *service.Service) (*WebServer, error) {
@@ -35,12 +35,12 @@ func NewWebServer(port uint, service *service.Service) (*WebServer, error) {
 }
 
 func (s *WebServer) addRoutes() {
-	s.app.Post(_routeArticle, s.handleNewArticle())
-	s.app.Get(_routeArticle+"/:id", s.handleGetArticle())
-	s.app.Put(_routeArticle, s.handleUpdateArticle())
-	s.app.Delete(_routeArticle+"/:id", s.handleDeleteArticle())
+	s.app.Post(_routeItem, s.handleNewArticle())
+	s.app.Get(_routeItem+"/:id", s.handleGetArticle())
+	s.app.Put(_routeItem, s.handleUpdateArticle())
+	s.app.Delete(_routeItem+"/:id", s.handleDeleteArticle())
 
-	s.app.Get(_routeArticle, s.handleGetArticles())
+	s.app.Get(_routeItem, s.handleGetArticles())
 	s.app.Get(_routeAlive, s.handleAlive())
 }
 

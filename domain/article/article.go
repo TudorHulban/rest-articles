@@ -7,20 +7,19 @@ import (
 )
 
 type Article struct {
-	Title string `db:"title"`
-	URL   string `db:"url"`
-	ID    int64  `db:"id"`
+	Title string `db:"title" json:"title"`
+	URL   string `db:"url" json:"url"`
+	ID    int64  `db:"id" json:"id"`
 
-	CreatedOn time.Time  `db:"created_on"`
-	UpdatedOn *time.Time `db:"updated_on"`
-	DeletedOn *time.Time `db:"deleted_on"`
+	CreatedOn time.Time  `db:"created_on" json:"-"`
+	UpdatedOn *time.Time `db:"updated_on" json:"-"`
+	DeletedOn *time.Time `db:"deleted_on" json:"-"`
 }
 
 type Articles []*Article
 
 func (art Articles) String() string {
-	res := make([]string, len(art)+1, len(art)+1)
-	res = append(res, "Articles:")
+	res := []string{"Articles:"}
 
 	for _, article := range art {
 		res = append(res, fmt.Sprintf("Title: %s", (*article).Title))

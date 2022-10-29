@@ -23,7 +23,6 @@ content-type: application/json
 
 {
     "id": 1,
-    "title": "Title 1",
     "url": "updated URL"
 }
 

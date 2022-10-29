@@ -29,7 +29,7 @@ func (e ErrorApplication) Error() string {
 }
 
 func (e ErrorApplication) MarshalJSON() ([]byte, error) {
-	res := make(map[string]string)
+	res := make(map[string]string, 3)
 
 	res["area"] = string(e.Area)
 	res["errormessage"] = e.Message
