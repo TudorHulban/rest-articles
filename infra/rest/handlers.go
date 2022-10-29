@@ -2,6 +2,8 @@ package rest
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -105,25 +107,49 @@ func (s *WebServer) handleGetArticles() fiber.Handler {
 
 func (s *WebServer) handleUpdateArticle() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		type Request struct {
-			ID    int64  `json:"id"`
+		idRequest := c.Params("id")
+
+		idItem, errReq := strconv.Atoi(idRequest)
+		if errReq != nil {
+			return c.Status(http.StatusBadRequest).JSON(&fiber.Map{
+				"success": false,
+				"error":   errReq.Error(),
+			})
+		}
+
+		if idItem < 1 {
+			return c.Status(http.StatusBadRequest).JSON(&fiber.Map{
+				"success": false,
+				"error":   "ID should be at least 1",
+			})
+		}
+
+		type request struct {
 			Title string `json:"title"`
 			URL   string `json:"url"`
 		}
 
-		var req Request
+		var req request
 
-		if errBody := c.BodyParser(&req); errBody != nil {
-			c.Body()
-
+		if errUn := json.Unmarshal(c.Body(), &req); errUn != nil {
 			return c.Status(http.StatusBadRequest).JSON(&fiber.Map{
-				"success": false,
-				"error":   errBody.Error(),
+				"success":     false,
+				"error":       fmt.Sprintf("for ID: %d: %s", idItem, errUn.Error()),
+				"requestbody": string(c.Body()),
 			})
 		}
 
+		// TODO: investigate why it did not work with body parser
+		// if errBody := c.BodyParser(&req); errBody != nil {
+		// 	return c.Status(http.StatusBadRequest).JSON(&fiber.Map{
+		// 		"success":     false,
+		// 		"error":       fmt.Sprintf("for ID: %d: %s", idItem, errBody.Error()),
+		// 		"requestbody": string(c.Body()),
+		// 	})
+		// }
+
 		params := service.ParamsUpdateArticle{
-			ID:    req.ID,
+			ID:    int64(idItem),
 			Title: &req.Title,
 			URL:   &req.URL,
 		}

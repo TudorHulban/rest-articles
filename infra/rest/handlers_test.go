@@ -19,7 +19,7 @@ import (
 
 var (
 	_itemCreate = `{"title":"%s","url":"%s"}`
-	_itemUpdate = `{"id":"%s","url":"%s"}`
+	_itemUpdate = `{"url":"%s"}`
 )
 
 func TestHandlers(t *testing.T) {
@@ -84,7 +84,8 @@ func TestHandlers(t *testing.T) {
 
 	urlUpdate := "http://xyz.eu"
 
-	reqUpdate := httptest.NewRequest(http.MethodPut, _routeItem, strings.NewReader(fmt.Sprintf(_itemUpdate, insertID, urlUpdate)))
+	reqUpdate := httptest.NewRequest(http.MethodPut, _routeItem+"/"+insertID, strings.NewReader(fmt.Sprintf(_itemUpdate, urlUpdate)))
+
 	reqCreate.Header.Set("Content-type", "application/json")
 
 	respPUT, errPUT := web.app.Test(reqUpdate)
@@ -100,4 +101,23 @@ func TestHandlers(t *testing.T) {
 
 	utils.AssertEqual(t, nil, errPUT)
 	utils.AssertEqual(t, http.StatusOK, respPUT.StatusCode)
+
+	respUpdated, errUpdated := web.app.Test(httptest.NewRequest(http.MethodGet, _routeItem+"/"+insertID, nil))
+	t.Logf("GET:\n%v", respUpdated)
+
+	utils.AssertEqual(t, nil, errUpdated)
+	utils.AssertEqual(t, http.StatusOK, respUpdated.StatusCode)
+
+	defer respUpdated.Body.Close()
+
+	bodyUpdated, errBodyUpdated := ioutil.ReadAll(respUpdated.Body)
+	t.Logf("ITEM Updated:\n%s", bodyUpdated)
+
+	require.NoError(errBodyUpdated)
+	require.Equal(title, gjson.Get(string(bodyUpdated), "article.title").String())
+	require.Equal(urlUpdate, gjson.Get(string(bodyUpdated), "article.url").String())
+
+	respDel, errDel := web.app.Test(httptest.NewRequest(http.MethodDelete, _routeItem+"/"+insertID, nil))
+	utils.AssertEqual(t, nil, errDel)
+	utils.AssertEqual(t, 200, respDel.StatusCode)
 }
