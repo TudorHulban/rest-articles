@@ -34,7 +34,7 @@ func (repo *Repository) Migration(model any) error {
 	return repo.DBConn.AutoMigrate(model)
 }
 
-func (repo *Repository) CreateOne(ctx context.Context, item *domain.Article) (int64, error) {
+func (repo *Repository) CreateOne(item *domain.Article) (int64, error) {
 	errInsert := repo.DBConn.Create(item).Error
 
 	return item.ID, errInsert
@@ -45,7 +45,7 @@ func (repo *Repository) CreateOne(ctx context.Context, item *domain.Article) (in
 func (repo *Repository) CreateMany(ctx context.Context, items *domain.Articles) (int, error) {
 	for ix, item := range *items {
 		if errInsert := repo.DBConn.Create(item).Error; errInsert != nil {
-			return ix, repo.Errors(fmt.Errorf("CreateMany:%w", errInsert))
+			return ix - 1, repo.Errors(fmt.Errorf("CreateMany:%w", errInsert))
 		}
 	}
 
@@ -53,25 +53,33 @@ func (repo *Repository) CreateMany(ctx context.Context, items *domain.Articles) 
 }
 
 func (repo *Repository) Find(ctx context.Context, id int64) (*domain.Article, error) {
-	var item domain.Article
+	select {
+	case <-ctx.Done():
+		return nil, repo.Errors(errors.New("context expired"))
 
-	tx := repo.DBConn.
-		Where("deleted_on is null").
-		First(&item, id)
+	default:
+		{
+			var item domain.Article
 
-	if tx.Error != nil {
-		if tx.Error.Error() == "record not found" {
-			return nil, apperrors.ErrObjectNotFound{}
+			tx := repo.DBConn.
+				Where("deleted_on is null").
+				First(&item, id)
+
+			if tx.Error != nil {
+				if tx.Error.Error() == "record not found" {
+					return nil, apperrors.ErrObjectNotFound{}
+				}
+
+				return nil, tx.Error
+			}
+
+			if tx.RowsAffected == 1 {
+				return &item, nil
+			}
+
+			return nil, fmt.Errorf("duplicates found for ID: %d", id)
 		}
-
-		return nil, tx.Error
 	}
-
-	if tx.RowsAffected == 1 {
-		return &item, nil
-	}
-
-	return nil, fmt.Errorf("duplicates found for ID: %d", id)
 }
 
 func (repo *Repository) FindAll(ctx context.Context) (*domain.Articles, error) {

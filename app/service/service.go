@@ -27,8 +27,10 @@ func NewService(repo *repository.Repository) (*Service, error) {
 	}, nil
 }
 
-func (s *Service) Stop() error {
-	return db.Close()
+func (s *Service) Errors(repoError error) *apperrors.ErrorApplication {
+	return &apperrors.ErrorApplication{
+		Area: apperrors.Areas[apperrors.ErrorAreaService],
+	}
 }
 
 type ParamsCreateArticle struct {
@@ -36,9 +38,9 @@ type ParamsCreateArticle struct {
 	URL   string `valid:"required"`
 }
 
-func (s *Service) CreateArticle(ctx context.Context, params *ParamsCreateArticle) (int64, error) {
+func (s *Service) CreateArticle(params *ParamsCreateArticle) (int64, error) {
 	if _, errVa := govalidator.ValidateStruct(params); errVa != nil {
-		return 0, fmt.Errorf(errorArgumentMessage, errVa)
+		return 0, s.Errors(fmt.Errorf("CreateArticle:%w", errVa))
 	}
 
 	item := domain.Article{
@@ -47,7 +49,7 @@ func (s *Service) CreateArticle(ctx context.Context, params *ParamsCreateArticle
 		CreatedOn: time.Now(),
 	}
 
-	itemID, errCr := s.repo.CreateOne(ctx, &item)
+	itemID, errCr := s.repo.CreateOne(&item)
 	if errCr != nil {
 		return 0, fmt.Errorf("CreateArticle: %w", errCr)
 	}
@@ -108,7 +110,7 @@ type ParamsUpdateArticle struct {
 
 func (s *Service) UpdateArticle(ctx context.Context, params *ParamsUpdateArticle) error {
 	if _, errVa := govalidator.ValidateStruct(params); errVa != nil {
-		return fmt.Errorf(errorArgumentMessage, errVa)
+		return s.Errors(fmt.Errorf("UpdateArticle:%w", errVa))
 	}
 
 	article, errDB := s.repo.Find(ctx, params.ID)
@@ -140,4 +142,8 @@ func (s *Service) DeleteArticle(ctx context.Context, id int64) error {
 	article.DeletedOn = &now
 
 	return s.repo.Update(ctx, article)
+}
+
+func (s *Service) Stop() error {
+	return db.Close()
 }

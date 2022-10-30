@@ -30,7 +30,7 @@ func TestRepository(t *testing.T) {
 		CreatedOn: time.Now(),
 	}
 
-	insertID, errInsert := repo.CreateOne(ctx, &item)
+	insertID, errInsert := repo.CreateOne(&item)
 	require.NoError(t, errInsert, "insert issues")
 
 	reconstructedItem, errFind := repo.Find(ctx, insertID)

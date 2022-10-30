@@ -30,7 +30,7 @@ func TestServiceArticle(t *testing.T) {
 	serv, errServ := NewService(repo)
 	require.NoError(t, errServ)
 
-	rowID, errCr := serv.CreateArticle(ctx, &paramsCreate)
+	rowID, errCr := serv.CreateArticle(&paramsCreate)
 	require.NoError(t, errCr)
 	require.NotNil(t, rowID)
 

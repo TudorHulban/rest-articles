@@ -37,7 +37,7 @@ func (s *WebServer) handleNewArticle() fiber.Handler {
 			})
 		}
 
-		idInsert, errIns := s.serv.CreateArticle(context.Background(), &service.ParamsCreateArticle{
+		idInsert, errIns := s.serv.CreateArticle(&service.ParamsCreateArticle{
 			Title: req.Title,
 			URL:   req.URL,
 		})
@@ -74,7 +74,7 @@ func (s *WebServer) handleGetArticle() fiber.Handler {
 			})
 		}
 
-		reconstructedItem, errFetch := s.serv.GetArticle(context.Background(), int64(idItem))
+		reconstructedItem, errFetch := s.serv.GetArticle(c.Context(), int64(idItem))
 		if errFetch != nil {
 			if errors.Is(errFetch, apperrors.ErrObjectNotFound{}) {
 				return c.Status(http.StatusOK).JSON(&fiber.Map{
