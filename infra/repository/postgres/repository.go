@@ -24,14 +24,32 @@ func NewRepository(db *gorm.DB) (*Repository, error) {
 	}, nil
 }
 
+func (repo *Repository) Errors(repoError error) *apperrors.ErrorApplication {
+	return &apperrors.ErrorApplication{
+		Area: apperrors.Areas[apperrors.ErrorAreaRepository],
+	}
+}
+
 func (repo *Repository) Migration(model any) error {
 	return repo.DBConn.AutoMigrate(model)
 }
 
-func (repo *Repository) Create(ctx context.Context, item *domain.Article) (int64, error) {
+func (repo *Repository) CreateOne(ctx context.Context, item *domain.Article) (int64, error) {
 	errInsert := repo.DBConn.Create(item).Error
 
 	return item.ID, errInsert
+}
+
+// CreateMany
+// TODO: assert if to move to transaction
+func (repo *Repository) CreateMany(ctx context.Context, items *domain.Articles) (int, error) {
+	for ix, item := range *items {
+		if errInsert := repo.DBConn.Create(item).Error; errInsert != nil {
+			return ix, repo.Errors(fmt.Errorf("CreateMany:%w", errInsert))
+		}
+	}
+
+	return len(*items), nil
 }
 
 func (repo *Repository) Find(ctx context.Context, id int64) (*domain.Article, error) {
@@ -61,24 +79,28 @@ func (repo *Repository) FindAll(ctx context.Context) (*domain.Articles, error) {
 
 	if errSelect := repo.DBConn.
 		Where("deleted_on is null").
-		Find(&items).Error; errSelect != nil {
+		Order("id asc").
+		Find(&items).
+		Error; errSelect != nil {
 		return nil, fmt.Errorf("FindAll: %w", errSelect)
 	}
 
 	return &items, nil
 }
 
-func (repo *Repository) FindAllPaginated(ctx context.Context, paginator *Pagination) (*Pagination, error) {
+func (repo *Repository) FindAllPaginated(ctx context.Context, paginator *Pagination) (*domain.Articles, error) {
 	var items domain.Articles
 
 	if errSelect := repo.DBConn.
 		Scopes(paginate(&domain.Article{}, paginator, repo.DBConn)).
 		Where("deleted_on is null").
-		Find(&items).Error; errSelect != nil {
+		Order("id asc").
+		Find(&items).
+		Error; errSelect != nil {
 		return nil, fmt.Errorf("FindAllPaginated: %w", errSelect)
 	}
 
-	return paginator, nil
+	return &items, nil
 }
 
 func (repo *Repository) Update(ctx context.Context, item *domain.Article) error {

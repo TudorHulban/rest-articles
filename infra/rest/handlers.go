@@ -117,8 +117,8 @@ func (s *WebServer) handleGetArticles() fiber.Handler {
 // handleGetArticlesWithPagination
 func (s *WebServer) handleGetArticlesWithPagination() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		limit := c.Params("limit")
-		page := c.Params("page")
+		limit := c.Query("limit")
+		page := c.Query("page")
 
 		nLimit, _ := strconv.Atoi(limit)
 		nPage, _ := strconv.Atoi(page)
@@ -133,7 +133,7 @@ func (s *WebServer) handleGetArticlesWithPagination() fiber.Handler {
 
 		return c.Status(http.StatusOK).JSON(&fiber.Map{
 			"success":  true,
-			"articles": paginatedItems.Rows,
+			"articles": paginatedItems,
 		})
 	}
 }

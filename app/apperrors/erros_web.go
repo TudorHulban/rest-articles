@@ -1,5 +1,5 @@
 package apperrors
 
 const (
-	ErrorMsgWebServerCreation = "web server creation: %s"
+	ErrorMsgWebServerCreation = "web server creation: %w"
 )

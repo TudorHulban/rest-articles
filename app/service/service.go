@@ -47,7 +47,7 @@ func (s *Service) CreateArticle(ctx context.Context, params *ParamsCreateArticle
 		CreatedOn: time.Now(),
 	}
 
-	itemID, errCr := s.repo.Create(ctx, &item)
+	itemID, errCr := s.repo.CreateOne(ctx, &item)
 	if errCr != nil {
 		return 0, fmt.Errorf("CreateArticle: %w", errCr)
 	}
@@ -83,14 +83,14 @@ func (s *Service) GetArticles(ctx context.Context) (*domain.Articles, error) {
 	}
 }
 
-func (s *Service) GetArticlesPaginated(ctx context.Context, limit, page int) (*repository.Pagination, error) {
-	pages, errAll := s.repo.FindAllPaginated(ctx, &repository.Pagination{
+func (s *Service) GetArticlesPaginated(ctx context.Context, limit, page int) (*domain.Articles, error) {
+	items, errAll := s.repo.FindAllPaginated(ctx, &repository.Pagination{
 		Limit: limit,
 		Page:  page,
 	})
 	switch {
 	case errAll == nil:
-		return pages, nil
+		return items, nil
 
 	case errors.As(errAll, &apperrors.ErrObjectNotFound{}):
 		return nil, apperrors.ErrObjectNotFound{}

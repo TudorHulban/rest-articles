@@ -1,5 +1,5 @@
 package apperrors
 
 const (
-	ErrorMsgServiceCreation = "service creation: %s"
+	ErrorMsgServiceCreation = "service creation: %w"
 )

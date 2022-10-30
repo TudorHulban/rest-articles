@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	ErrorMsgConnectionCreation = "DB connection creation: %s"
+	ErrorMsgConnectionCreation = "DB connection creation: %w"
 )
 
 // ErrObjectNotFound is used to indicate that selecting an individual object

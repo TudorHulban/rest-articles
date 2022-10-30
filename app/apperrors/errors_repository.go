@@ -1,6 +1,6 @@
 package apperrors
 
 const (
-	ErrorMsgRepositoryCreation      = "repository creation: %s"
-	ErrorMsgRepositoryMigrationsRun = "repository migrations: %s"
+	ErrorMsgRepositoryCreation      = "repository creation: %w"
+	ErrorMsgRepositoryMigrationsRun = "repository migrations: %w"
 )

@@ -18,7 +18,7 @@ func Initialize() (*rest.WebServer, *apperrors.ErrorApplication) {
 
 	dbConn, errCo := db.GetDBConnection()
 	if errCo != nil {
-		errorApp.Message = fmt.Sprintf(apperrors.ErrorMsgConnectionCreation, errCo)
+		errorApp.AreaError = fmt.Errorf(apperrors.ErrorMsgConnectionCreation, errCo)
 		errorApp.OSExit = &apperrors.OSExitForDatabaseIssues
 
 		return nil, &errorApp
@@ -26,7 +26,7 @@ func Initialize() (*rest.WebServer, *apperrors.ErrorApplication) {
 
 	repo, errRepo := repository.NewRepository(dbConn)
 	if errRepo != nil {
-		errorApp.Message = fmt.Sprintf(apperrors.ErrorMsgRepositoryCreation, errRepo)
+		errorApp.AreaError = fmt.Errorf(apperrors.ErrorMsgRepositoryCreation, errRepo)
 		errorApp.OSExit = &apperrors.OSExitForRepositoryIssues
 
 		return nil, &errorApp
@@ -34,7 +34,7 @@ func Initialize() (*rest.WebServer, *apperrors.ErrorApplication) {
 
 	errMi := repo.Migration(&domain.Article{})
 	if errMi != nil {
-		errorApp.Message = fmt.Sprintf(apperrors.ErrorMsgRepositoryMigrationsRun, errMi)
+		errorApp.AreaError = fmt.Errorf(apperrors.ErrorMsgRepositoryMigrationsRun, errMi)
 		errorApp.OSExit = &apperrors.OSExitForRepositoryMigrationsIssues
 
 		return nil, &errorApp
@@ -42,7 +42,7 @@ func Initialize() (*rest.WebServer, *apperrors.ErrorApplication) {
 
 	service, errServ := service.NewService(repo)
 	if errServ != nil {
-		errorApp.Message = fmt.Sprintf(apperrors.ErrorMsgServiceCreation, errServ)
+		errorApp.AreaError = fmt.Errorf(apperrors.ErrorMsgServiceCreation, errServ)
 		errorApp.OSExit = &apperrors.OSExitForServiceIssues
 
 		return nil, &errorApp
@@ -50,7 +50,7 @@ func Initialize() (*rest.WebServer, *apperrors.ErrorApplication) {
 
 	web, errWeb := rest.NewWebServer(3000, service)
 	if errWeb != nil {
-		errorApp.Message = fmt.Sprintf(apperrors.ErrorMsgWebServerCreation, errServ)
+		errorApp.AreaError = fmt.Errorf(apperrors.ErrorMsgWebServerCreation, errServ)
 		errorApp.OSExit = &apperrors.OSExitForWebServerIssues
 
 		return nil, &errorApp

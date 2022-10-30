@@ -2,6 +2,7 @@ package apperrors
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"testing"
 
@@ -10,10 +11,10 @@ import (
 
 func TestStringer(t *testing.T) {
 	errApp := ErrorApplication{
-		Area:    Areas[ErrorAreaInfra],
-		Message: "this is error message",
-		Code:    "INFRA-1234",
-		OSExit:  &OSExitForDatabaseIssues,
+		Area:      Areas[ErrorAreaInfra],
+		AreaError: errors.New("this is error message"),
+		Code:      "INFRA-1234",
+		OSExit:    &OSExitForDatabaseIssues,
 	}
 
 	fmt.Println(errApp)
@@ -21,10 +22,10 @@ func TestStringer(t *testing.T) {
 
 func TestMarshaler(t *testing.T) {
 	errApp := ErrorApplication{
-		Area:    Areas[ErrorAreaInfra],
-		Message: "this is error message",
-		Code:    "INFRA-1234",
-		OSExit:  &OSExitForDatabaseIssues,
+		Area:      Areas[ErrorAreaInfra],
+		AreaError: errors.New("this is error message"),
+		Code:      "INFRA-1234",
+		OSExit:    &OSExitForDatabaseIssues,
 	}
 
 	raw, errMa := json.Marshal(errApp)
