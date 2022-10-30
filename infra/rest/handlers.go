@@ -99,7 +99,7 @@ func (s *WebServer) handleGetArticle() fiber.Handler {
 // handleGetArticles - no pagination
 func (s *WebServer) handleGetArticles() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		articles, errReq := s.serv.GetArticles(context.Background())
+		items, errReq := s.serv.GetArticles(context.Background())
 		if errReq != nil {
 			return c.Status(http.StatusInternalServerError).JSON(&fiber.Map{
 				"success": false,
@@ -109,7 +109,31 @@ func (s *WebServer) handleGetArticles() fiber.Handler {
 
 		return c.Status(http.StatusOK).JSON(&fiber.Map{
 			"success":  true,
-			"articles": articles,
+			"articles": items,
+		})
+	}
+}
+
+// handleGetArticlesWithPagination
+func (s *WebServer) handleGetArticlesWithPagination() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		limit := c.Params("limit")
+		page := c.Params("page")
+
+		nLimit, _ := strconv.Atoi(limit)
+		nPage, _ := strconv.Atoi(page)
+
+		paginatedItems, errReq := s.serv.GetArticlesPaginated(context.Background(), nLimit, nPage)
+		if errReq != nil {
+			return c.Status(http.StatusInternalServerError).JSON(&fiber.Map{
+				"success": false,
+				"error":   errReq.Error(),
+			})
+		}
+
+		return c.Status(http.StatusOK).JSON(&fiber.Map{
+			"success":  true,
+			"articles": paginatedItems.Rows,
 		})
 	}
 }

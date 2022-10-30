@@ -19,6 +19,7 @@ type WebServer struct {
 
 const (
 	_routeItem  = "/api/v1/article"
+	_routeItems = "/api/v1/articles"
 	_routeAlive = "/"
 )
 
@@ -40,7 +41,9 @@ func (s *WebServer) addRoutes() {
 	s.app.Put(_routeItem+"/:id", s.handleUpdateArticle())
 	s.app.Delete(_routeItem+"/:id", s.handleDeleteArticle())
 
-	s.app.Get(_routeItem, s.handleGetArticles())
+	s.app.Get(_routeItems+"/all", s.handleGetArticles())
+	s.app.Get(_routeItems, s.handleGetArticlesWithPagination())
+
 	s.app.Get(_routeAlive, s.handleAlive())
 }
 
@@ -60,10 +63,18 @@ func (s *WebServer) Start() {
 	fmt.Println("start - stopped now: no error")
 }
 
-func (s *WebServer) Stop() {
+// Stop relases web server and service.
+// Returns closing errors from web and service.
+func (s *WebServer) Stop() (error, error) {
 	fmt.Println("stopping Fiber")
 
+	var errWebClose, errServiceClose error
+
 	if errShut := s.app.Shutdown(); errShut != nil {
-		fmt.Printf("error Fiber: %s\n", errShut.Error())
+		fmt.Printf("error Fiber: %s\n", errShut.Error()) // local handling can be improved
+
+		errWebClose = errShut
 	}
+
+	return errWebClose, errServiceClose
 }

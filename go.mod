@@ -5,8 +5,6 @@ go 1.19
 require (
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
 	github.com/gofiber/fiber/v2 v2.38.1
-	github.com/joho/godotenv v1.4.0
-	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/lib/pq v1.10.7
 	github.com/stretchr/testify v1.8.0
 	github.com/tidwall/gjson v1.14.3

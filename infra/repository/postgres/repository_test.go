@@ -19,6 +19,7 @@ func TestRepository(t *testing.T) {
 
 	repo, errRepo := NewRepository(dbConn)
 	require.NoError(t, errRepo)
+	require.NoError(t, repo.Migration(&domain.Article{}))
 
 	item := domain.Article{
 		Title:     "The Title " + strconv.Itoa(int(time.Now().Unix())),

@@ -16,6 +16,7 @@ func main() {
 			os.Exit(*errWeb.OSExit)
 		}
 	}
+	defer web.Stop()
 
 	web.Start()
 }

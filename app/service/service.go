@@ -8,6 +8,7 @@ import (
 
 	"github.com/TudorHulban/rest-articles/app/apperrors"
 	domain "github.com/TudorHulban/rest-articles/domain/article"
+	"github.com/TudorHulban/rest-articles/infra/db"
 	repository "github.com/TudorHulban/rest-articles/infra/repository/postgres"
 	"github.com/asaskevich/govalidator"
 )
@@ -24,6 +25,10 @@ func NewService(repo *repository.Repository) (*Service, error) {
 	return &Service{
 		repo: *repo,
 	}, nil
+}
+
+func (s *Service) Stop() error {
+	return db.Close()
 }
 
 type ParamsCreateArticle struct {
@@ -69,6 +74,23 @@ func (s *Service) GetArticles(ctx context.Context) (*domain.Articles, error) {
 	switch {
 	case errAll == nil:
 		return articles, nil
+
+	case errors.As(errAll, &apperrors.ErrObjectNotFound{}):
+		return nil, apperrors.ErrObjectNotFound{}
+
+	default:
+		return nil, errAll
+	}
+}
+
+func (s *Service) GetArticlesPaginated(ctx context.Context, limit, page int) (*repository.Pagination, error) {
+	pages, errAll := s.repo.FindAllPaginated(ctx, &repository.Pagination{
+		Limit: limit,
+		Page:  page,
+	})
+	switch {
+	case errAll == nil:
+		return pages, nil
 
 	case errors.As(errAll, &apperrors.ErrObjectNotFound{}):
 		return nil, apperrors.ErrObjectNotFound{}

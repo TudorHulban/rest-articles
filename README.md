@@ -38,4 +38,5 @@ https://firehydrant.com/blog/develop-a-go-app-with-docker-compose/
 https://stackoverflow.com/questions/52115178/create-a-database-then-table-with-dockerfile
 https://golangbot.com/mysql-create-table-insert-row/
 https://dev.to/devsmranjan/golang-build-your-first-rest-api-with-fiber-24eh
+https://dev.to/rafaelgfirmino/pagination-using-gorm-scopes-3k5f
 ```
