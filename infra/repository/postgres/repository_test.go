@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/TudorHulban/rest-articles/app/apperrors"
 	domain "github.com/TudorHulban/rest-articles/domain/article"
 	"github.com/TudorHulban/rest-articles/infra/db"
 	"github.com/stretchr/testify/require"
@@ -39,7 +40,6 @@ func TestRepository(t *testing.T) {
 	articles, errAll := repo.FindAll(ctx)
 	require.NoError(t, errAll)
 	require.GreaterOrEqual(t, len(*articles), 1)
-	require.Equal(t, insertID, (*articles)[len(*articles)-1].ID)
 
 	updatedTimestamp := time.Now()
 	itemUpdated := domain.Article{
@@ -70,10 +70,8 @@ func TestRepository(t *testing.T) {
 	require.NoError(t, errDel)
 
 	reconstructedItemDeleted, errFindDeleted := repo.Find(ctx, insertID)
-	require.NoError(t, errFindDeleted, errFindDeleted)
-	require.Equal(t, insertID, reconstructedItemDeleted.ID)
-	require.NotNil(t, reconstructedItemDeleted.UpdatedOn)
-	require.NotNil(t, reconstructedItemDeleted.DeletedOn)
+	require.ErrorAs(t, errFindDeleted, &apperrors.ErrObjectNotFound{})
+	require.Zero(t, reconstructedItemDeleted)
 }
 
 func TestItemNotFound(t *testing.T) {
@@ -88,5 +86,5 @@ func TestItemNotFound(t *testing.T) {
 
 	_, errFind := repo.Find(ctx, -1)
 	require.Error(t, errFind)
-	require.ErrorAs(t, errFind, &db.ErrObjectNotFound{})
+	require.ErrorAs(t, errFind, &apperrors.ErrObjectNotFound{})
 }

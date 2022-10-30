@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/TudorHulban/rest-articles/app/apperrors"
 	domain "github.com/TudorHulban/rest-articles/domain/article"
-	"github.com/TudorHulban/rest-articles/infra/db"
 	"gorm.io/gorm"
 )
 
@@ -37,10 +37,10 @@ func (repo *Repository) Create(ctx context.Context, item *domain.Article) (int64
 func (repo *Repository) Find(ctx context.Context, id int64) (*domain.Article, error) {
 	var item domain.Article
 
-	tx := repo.DBConn.First(&item, id)
+	tx := repo.DBConn.Where("deleted_on is null").First(&item, id)
 	if tx.Error != nil {
 		if tx.Error.Error() == "record not found" {
-			return nil, db.ErrObjectNotFound{}
+			return nil, apperrors.ErrObjectNotFound{}
 		}
 
 		return nil, tx.Error
@@ -70,5 +70,5 @@ func (repo *Repository) Update(ctx context.Context, item *domain.Article) error 
 		return nil
 	}
 
-	return db.ErrObjectNotFound{}
+	return apperrors.ErrObjectNotFound{}
 }

@@ -2,7 +2,7 @@ package rest
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -44,7 +44,7 @@ func TestHandlers(t *testing.T) {
 	web.addRoutes()
 
 	title := "The Title"
-	urlCreate := "http://abc.eu"
+	urlCreate := "http://initial.abc.eu"
 
 	resp, errBadReq := web.app.Test(httptest.NewRequest(http.MethodGet, _routeItem+"/abc", nil))
 	utils.AssertEqual(t, nil, errBadReq)
@@ -59,7 +59,7 @@ func TestHandlers(t *testing.T) {
 
 	defer respPOST.Body.Close()
 
-	bodyID, errID := ioutil.ReadAll(respPOST.Body)
+	bodyID, errID := io.ReadAll(respPOST.Body)
 	t.Log(string(bodyID))
 
 	require.NoError(errID)
@@ -75,14 +75,14 @@ func TestHandlers(t *testing.T) {
 
 	defer respItem.Body.Close()
 
-	bodyItem, errItem := ioutil.ReadAll(respItem.Body)
+	bodyItem, errItem := io.ReadAll(respItem.Body)
 	t.Logf("ITEM:\n%s", bodyItem)
 
 	require.NoError(errItem)
 	require.Equal(title, gjson.Get(string(bodyItem), "article.title").String())
 	require.Equal(urlCreate, gjson.Get(string(bodyItem), "article.url").String())
 
-	urlUpdate := "http://xyz.eu"
+	urlUpdate := "http://updated.abc.eu"
 
 	reqUpdate := httptest.NewRequest(http.MethodPut, _routeItem+"/"+insertID, strings.NewReader(fmt.Sprintf(_itemUpdate, urlUpdate)))
 
@@ -93,7 +93,7 @@ func TestHandlers(t *testing.T) {
 
 	defer respPUT.Body.Close()
 
-	bodyPUT, errPUTBody := ioutil.ReadAll(respPUT.Body)
+	bodyPUT, errPUTBody := io.ReadAll(respPUT.Body)
 	t.Logf("Body PUT response:\n%s", bodyPUT)
 	t.Logf("Error PUT response:\n%s", errPUTBody)
 
@@ -110,7 +110,7 @@ func TestHandlers(t *testing.T) {
 
 	defer respUpdated.Body.Close()
 
-	bodyUpdated, errBodyUpdated := ioutil.ReadAll(respUpdated.Body)
+	bodyUpdated, errBodyUpdated := io.ReadAll(respUpdated.Body)
 	t.Logf("ITEM Updated:\n%s", bodyUpdated)
 
 	require.NoError(errBodyUpdated)
@@ -120,4 +120,18 @@ func TestHandlers(t *testing.T) {
 	respDel, errDel := web.app.Test(httptest.NewRequest(http.MethodDelete, _routeItem+"/"+insertID, nil))
 	utils.AssertEqual(t, nil, errDel)
 	utils.AssertEqual(t, 200, respDel.StatusCode)
+
+	respItemDeleted, errGETDeleted := web.app.Test(httptest.NewRequest(http.MethodGet, _routeItem+"/"+insertID, nil))
+	t.Logf("GET:\n%v", respItemDeleted)
+	t.Logf("Error DELETE response:\n%s", errGETDeleted)
+
+	utils.AssertEqual(t, nil, errGETDeleted)
+	utils.AssertEqual(t, http.StatusOK, respItemDeleted.StatusCode)
+
+	defer respItemDeleted.Body.Close()
+
+	bodyDeleted, errBodyDeleted := io.ReadAll(respItemDeleted.Body)
+	t.Logf("ITEM Deleted:\n%s", string(bodyDeleted))
+
+	require.NoError(errBodyDeleted, errBodyDeleted)
 }

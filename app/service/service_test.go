@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/TudorHulban/rest-articles/app/apperrors"
 	"github.com/TudorHulban/rest-articles/infra/db"
 	repository "github.com/TudorHulban/rest-articles/infra/repository/postgres"
 	"github.com/stretchr/testify/require"
@@ -59,6 +60,6 @@ func TestServiceArticle(t *testing.T) {
 	require.NoError(t, errDel)
 
 	reconstructedItemDeleted, errDel := serv.GetArticle(ctx, rowID)
-	require.NoError(t, errDel)
-	require.NotZero(t, reconstructedItemDeleted.DeletedOn)
+	require.ErrorAs(t, errDel, &apperrors.ErrObjectNotFound{})
+	require.Zero(t, reconstructedItemDeleted)
 }

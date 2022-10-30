@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/TudorHulban/rest-articles/app/apperrors"
 	domain "github.com/TudorHulban/rest-articles/domain/article"
-	"github.com/TudorHulban/rest-articles/infra/db"
 	repository "github.com/TudorHulban/rest-articles/infra/repository/postgres"
 	"github.com/asaskevich/govalidator"
 )
@@ -56,8 +56,8 @@ func (s *Service) GetArticle(ctx context.Context, id int64) (*domain.Article, er
 	case errFind == nil:
 		return article, nil
 
-	case errors.As(errFind, &db.ErrObjectNotFound{}):
-		return nil, db.ErrObjectNotFound{}
+	case errors.As(errFind, &apperrors.ErrObjectNotFound{}):
+		return nil, apperrors.ErrObjectNotFound{}
 
 	default:
 		return nil, errFind
@@ -70,8 +70,8 @@ func (s *Service) GetArticles(ctx context.Context) (*domain.Articles, error) {
 	case errAll == nil:
 		return articles, nil
 
-	case errors.As(errAll, &db.ErrObjectNotFound{}):
-		return nil, db.ErrObjectNotFound{}
+	case errors.As(errAll, &apperrors.ErrObjectNotFound{}):
+		return nil, apperrors.ErrObjectNotFound{}
 
 	default:
 		return nil, errAll

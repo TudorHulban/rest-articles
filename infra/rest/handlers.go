@@ -3,10 +3,12 @@ package rest
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
 
+	"github.com/TudorHulban/rest-articles/app/apperrors"
 	"github.com/TudorHulban/rest-articles/app/service"
 	"github.com/gofiber/fiber/v2"
 )
@@ -74,6 +76,13 @@ func (s *WebServer) handleGetArticle() fiber.Handler {
 
 		reconstructedItem, errFetch := s.serv.GetArticle(context.Background(), int64(idItem))
 		if errFetch != nil {
+			if errors.Is(errFetch, apperrors.ErrObjectNotFound{}) {
+				return c.Status(http.StatusOK).JSON(&fiber.Map{
+					"success": true,
+					"error":   errFetch.Error(),
+				})
+			}
+
 			return c.Status(http.StatusInternalServerError).JSON(&fiber.Map{
 				"success": false,
 				"error":   errFetch.Error(),
@@ -139,7 +148,7 @@ func (s *WebServer) handleUpdateArticle() fiber.Handler {
 			})
 		}
 
-		// TODO: investigate why it did not work with body parser
+		// TODO: investigate why unit test did not work with body parser
 		// if errBody := c.BodyParser(&req); errBody != nil {
 		// 	return c.Status(http.StatusBadRequest).JSON(&fiber.Map{
 		// 		"success":     false,
@@ -170,6 +179,7 @@ func (s *WebServer) handleUpdateArticle() fiber.Handler {
 func (s *WebServer) handleDeleteArticle() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		idRequest := c.Params("id")
+
 		idItem, errReq := strconv.Atoi(idRequest)
 		if errReq != nil {
 			return c.Status(http.StatusBadRequest).JSON(&fiber.Map{
