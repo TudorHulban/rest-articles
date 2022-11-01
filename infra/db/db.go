@@ -3,6 +3,7 @@ package db
 import (
 	"fmt"
 
+	"github.com/TudorHulban/rest-articles/app/configs"
 	_ "github.com/lib/pq"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -18,10 +19,10 @@ type configDB struct {
 
 func newTestConfigDB() configDB {
 	return configDB{
-		Name:     "rest",
+		Name:     configs.GetDatabaseName(),
 		User:     "postgres",
 		Password: "thepassword",
-		Host:     "localhost",
+		Host:     "database",
 		Port:     5432,
 	}
 }
