@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -37,7 +36,7 @@ func (s *WebServer) handleNewArticle() fiber.Handler {
 			})
 		}
 
-		idInsert, errIns := s.serv.CreateArticle(&service.ParamsCreateArticle{
+		idInsert, errIns := s.serv.CreateArticle(c.Context(), &service.ParamsCreateArticle{
 			Title: req.Title,
 			URL:   req.URL,
 		})
@@ -99,7 +98,7 @@ func (s *WebServer) handleGetArticle() fiber.Handler {
 // handleGetArticles - no pagination
 func (s *WebServer) handleGetArticles() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		items, errReq := s.serv.GetArticles(context.Background())
+		items, errReq := s.serv.GetArticles(c.Context())
 		if errReq != nil {
 			return c.Status(http.StatusInternalServerError).JSON(&fiber.Map{
 				"success": false,
@@ -123,7 +122,7 @@ func (s *WebServer) handleGetArticlesWithPagination() fiber.Handler {
 		nLimit, _ := strconv.Atoi(limit)
 		nPage, _ := strconv.Atoi(page)
 
-		paginatedItems, errReq := s.serv.GetArticlesPaginated(context.Background(), nLimit, nPage)
+		paginatedItems, errReq := s.serv.GetArticlesPaginated(c.Context(), nLimit, nPage)
 		if errReq != nil {
 			return c.Status(http.StatusInternalServerError).JSON(&fiber.Map{
 				"success": false,
@@ -187,7 +186,7 @@ func (s *WebServer) handleUpdateArticle() fiber.Handler {
 			URL:   &req.URL,
 		}
 
-		if errUpd := s.serv.UpdateArticle(context.Background(), &params); errUpd != nil {
+		if errUpd := s.serv.UpdateArticle(c.Context(), &params); errUpd != nil {
 			return c.Status(http.StatusBadRequest).JSON(&fiber.Map{
 				"success": false,
 				"error":   errUpd.Error(),
@@ -219,7 +218,7 @@ func (s *WebServer) handleDeleteArticle() fiber.Handler {
 			})
 		}
 
-		if errDel := s.serv.DeleteArticle(context.Background(), int64(idItem)); errDel != nil {
+		if errDel := s.serv.DeleteArticle(c.Context(), int64(idItem)); errDel != nil {
 			return c.Status(http.StatusBadRequest).JSON(&fiber.Map{
 				"success": false,
 				"error":   errDel.Error(),

@@ -38,7 +38,7 @@ type ParamsCreateArticle struct {
 	URL   string `valid:"required"`
 }
 
-func (s *Service) CreateArticle(params *ParamsCreateArticle) (int64, error) {
+func (s *Service) CreateArticle(ctx context.Context, params *ParamsCreateArticle) (int64, error) {
 	if _, errVa := govalidator.ValidateStruct(params); errVa != nil {
 		return 0, s.Errors(fmt.Errorf("CreateArticle:%w", errVa))
 	}
@@ -49,7 +49,7 @@ func (s *Service) CreateArticle(params *ParamsCreateArticle) (int64, error) {
 		CreatedOn: time.Now(),
 	}
 
-	itemID, errCr := s.repo.CreateOne(&item)
+	itemID, errCr := s.repo.CreateOne(ctx, &item)
 	if errCr != nil {
 		return 0, fmt.Errorf("CreateArticle: %w", errCr)
 	}

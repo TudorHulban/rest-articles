@@ -7,6 +7,8 @@ const (
 	ErrorAreaRepository
 )
 
+const ErrorMsgForContextExpiration = "context expired"
+
 var Areas = map[int]ErrorArea{
 	1: ErrorArea("INFRA"),
 	2: ErrorArea("WEB"),
