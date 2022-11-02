@@ -9,7 +9,7 @@ import (
 type Article struct {
 	Title string `db:"title" json:"title"`
 	URL   string `db:"url" json:"url"`
-	ID    int64  `db:"id" json:"id"`
+	ID    int64  `db:"id" json:"id" gorm:"PRIMARY_KEY"`
 
 	CreatedOn time.Time  `db:"created_on" json:"-"`
 	UpdatedOn *time.Time `db:"updated_on" json:"-"`

@@ -7,6 +7,7 @@ import (
 	_ "github.com/lib/pq"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 type configDB struct {
@@ -37,5 +38,7 @@ func connect(cfg configDB) (*gorm.DB, error) {
 		cfg.Name,
 	)
 
-	return gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	return gorm.Open(postgres.Open(dsn), &gorm.Config{}, &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
 }
