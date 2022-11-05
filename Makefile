@@ -1,8 +1,3 @@
-.PHONY: infra
-infra:
-	@make infra-cleanup
-	@docker-compose up --renew-anon-volumes
-
 .PHONY: infra-cleanup
 infra-cleanup:
 	@docker-compose down --volumes
@@ -12,9 +7,9 @@ infra-cleanup:
 # 1. Database Related
 .PHONY: database-unit
 database-unit:
-	@docker-compose --profile unittest up
+	@docker-compose --profile unittest up --build
 
-# 2. unit Testing
+# 2. Unit Testing
 .PHONY: test
 test: ## Run tests with check race and coverage
 	@go test -failfast -count=1 ./... -json -cover -race | tparse -smallscreen

@@ -1,36 +1,79 @@
 # rest-articles
+## Introduction
+The repository contains functionality that serves interacting with an Article object.  
+The Article with plural Articles is an object with title and URL as properties.   
+The object is defines as:
+```go
+type Article struct {
+	Title string `db:"title" json:"title"`
+	URL   string `db:"url" json:"url"`
+	ID    int64  `db:"id" json:"id" gorm:"PRIMARY_KEY"`
+
+	CreatedOn time.Time  `db:"created_on" json:"-"`
+	UpdatedOn *time.Time `db:"updated_on" json:"-"`
+	DeletedOn *time.Time `db:"deleted_on" json:"-"`
+}
+```
+An Article has an ID primary key and tags for JSON and database purposes are introduced.  The ID field is not placed as first in the structure for memory allignment reasons.  
+An Article can be persisted using a PostgreSQL repository and served to a transport by the application service. The curent transport is done as REST with the Fiber web gramework.  
+Appication configuration is limited to database name due to time constraints.  
+Managing the application can be done using the make targets defined.
+## Error Handling
+The app mainly uses an error type as below with error messages concentrated in an error package. 
+```go
+type ErrorApplication struct {
+	Area      ErrorArea
+	AreaError error
+	Code      string
+	OSExit    *int
+}
+```
+In each area helpers should exist, example:
+```go
+func (repo *Repository) Errors(repoError error) *apperrors.ErrorApplication {
+	return &apperrors.ErrorApplication{
+		Area: apperrors.Areas[apperrors.ErrorAreaRepository],
+	}
+}
+
+func (repo *Repository) ErrorsWCode(code string, repoError error) *apperrors.ErrorApplication {
+	return &apperrors.ErrorApplication{
+		Area: apperrors.Areas[apperrors.ErrorAreaRepository],
+		Code: code,
+	}
+}
+```
+This approach should improve:  
+a. the understanding of the application as high level information about the application areas is concentrated in one package  
+b. error messages updates as there is only one place which offers a full view of the errors  
+c. documentation as the app errors package can be easily shared with other teams
+## Logging
+Was not added due to time constraints.
+## Open API 
+Was not added due to time constraints.
 ## Unit testing
-### Docker Postgres
-### Create Docker image
+### Prerequisites
+Go starting with version 1.19.  
+Docker Compose starting with version 3.9.
+### Start the database container
 ```sh
-docker build - < Dockerfile_Postgres -t database
+make database-unit
 ```
+### Run unit tests
 ```sh
-sudo docker run -d --name=co-postgres -p 5432:5432 -e POSTGRES_PASSWORD=thepassword postgres
+make test
 ```
-### Database Objects
-Run migrations:
+## Run
+Perform clean up if unit testing was done with:
 ```sh
-migrate -path migrations/ -database postgres://postgres:thepassword@127.0.0.1:5432/rest?sslmode=disable -verbose up 2
+make infra-cleanup
 ```
-## Prerequisites
-### Docker ( Compose )
-## Infrastructure
-Use below command to create infrastructure:
+Run:
 ```sh
-make infra
-```
-## Test Go Docker file
-### Create Docker image
-```sh
-sudo docker build -t goapp Dockerfile_GoApp
-```
-### Create container from the Docker image created
-```sh
-sudo docker run -d --name=co-goapp -p 3000:3000 goapp
+make run
 ```
 ## Benchmark
-With key app from https://github.com/rakyll/hey.
+With `hey` app from https://github.com/rakyll/hey.
 ```sh
 tudi@pad16:~/ram$ ./hey -m GET  -n 10000 "http://localhost:3000/api/v1/article/1"
 

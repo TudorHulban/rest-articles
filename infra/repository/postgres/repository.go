@@ -30,6 +30,13 @@ func (repo *Repository) Errors(repoError error) *apperrors.ErrorApplication {
 	}
 }
 
+func (repo *Repository) ErrorsWCode(code string, repoError error) *apperrors.ErrorApplication {
+	return &apperrors.ErrorApplication{
+		Area: apperrors.Areas[apperrors.ErrorAreaRepository],
+		Code: code,
+	}
+}
+
 func (repo *Repository) Migration(model any) error {
 	return repo.DBConn.AutoMigrate(model)
 }
