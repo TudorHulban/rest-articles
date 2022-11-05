@@ -16,7 +16,16 @@ func main() {
 			os.Exit(*errWeb.OSExit)
 		}
 	}
-	defer web.Stop()
+	defer func() {
+		errWebStop, errServStop := web.Stop()
+		if errWebStop != nil {
+			fmt.Println(errWebStop)
+		}
+
+		if errServStop != nil {
+			fmt.Println(errServStop)
+		}
+	}()
 
 	web.Start()
 }

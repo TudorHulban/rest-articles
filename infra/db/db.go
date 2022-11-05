@@ -23,7 +23,7 @@ func newTestConfigDB() configDB {
 		Name:     configs.GetDatabaseName(),
 		User:     "postgres",
 		Password: "thepassword",
-		Host:     "database",
+		Host:     configs.GetDatabaseHost(),
 		Port:     5432,
 	}
 }

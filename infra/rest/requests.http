@@ -1,5 +1,4 @@
-### CREATE
-
+### CREATE Item
 POST http://localhost:3000/api/v1/article HTTP/1.1
 content-type: application/json
 
@@ -8,26 +7,17 @@ content-type: application/json
     "url": "htttp://blog.eu/article1"
 }
 
-### RETRIEVE Article
-
+### RETRIEVE Item
 GET http://localhost:3000/api/v1/article/1
 
-### RETRIEVE Articles Paginated
-
-GET http://localhost:3000/api/v1/articles/
-
-### RETRIEVE Articles All
-
+### RETRIEVE Items All
 GET http://localhost:3000/api/v1/articles/all/
 
-### RETRIEVE Articles Paginated
-
+### RETRIEVE Items Paginated
 GET http://localhost:3000/api/v1/articles?limit=2&page=1
 
-
 ### UPDATE
-
-PUT http://localhost:3000/api/v1/article/7 HTTP/1.1
+PUT http://localhost:3000/api/v1/article/1 HTTP/1.1
 content-type: application/json
 
 {
@@ -35,6 +25,5 @@ content-type: application/json
 }
 
 ### DELETE
-
 DELETE  http://localhost:3000/api/v1/article/1 HTTP/1.1
 

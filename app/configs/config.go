@@ -10,3 +10,11 @@ func GetDatabaseName() string {
 
 	return res
 }
+
+func GetDatabaseHost() string {
+	if len(os.Getenv("POSTGRES_DATABASE")) == 0 {
+		return "localhost"
+	}
+
+	return "database"
+}
