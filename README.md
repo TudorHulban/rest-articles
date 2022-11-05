@@ -1,8 +1,8 @@
-# rest-articles
+# rest-articles (MVP)
 ## Introduction
 The repository contains functionality that serves interacting with an Article object.  
-The Article with plural Articles is an object with title and URL as properties.   
-The object is defines as:
+The Article, with plural Articles, is an object with title and URL as properties.   
+The object is defined as:
 ```go
 type Article struct {
 	Title string `db:"title" json:"title"`
@@ -14,7 +14,7 @@ type Article struct {
 	DeletedOn *time.Time `db:"deleted_on" json:"-"`
 }
 ```
-An Article has an ID primary key and tags for JSON and database purposes are introduced.  The ID field is not placed as first in the structure for memory allignment reasons.  
+An Article has an ID primary key, and tags for JSON and database purposes are introduced.  The ID field is not placed as first in the structure for memory allignment reasons. Unicity indexes were not placed on title or URL due to time constraints.   
 An Article can be persisted using a PostgreSQL repository and served to a transport by the application service. The curent transport is done as REST with the Fiber web framework.  
 Appication configuration is limited to database name and host due to time constraints.  
 Managing the application can be done using the make targets defined.
@@ -79,7 +79,7 @@ Below endpoints would be available on run:
 | http://localhost:3000/api/v1/article |POST |Create Item|
 | http://localhost:3000/api/v1/article/:id |GET |Get Item wth ID|
 | http://localhost:3000/api/v1/article/:id |PUT |Update Item wth ID|
-| http://localhost:3000/api/v1/article/:id |DELETE |Delete Item wth ID|
+| http://localhost:3000/api/v1/article/:id |DELETE |Soft Delete Item wth ID|
 | http://localhost:3000/api/v1/articles/all/ |GET |Get all items|
 | http://localhost:3000/api/v1/articles?limit=2&page=1 |GET |Get items with pagination|
 A `.http` file with requests to these endpoint resides in the `rest` package.
