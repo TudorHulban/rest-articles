@@ -1,4 +1,4 @@
-package rest
+package rest_test
 
 import (
 	"fmt"
@@ -8,10 +8,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/TudorHulban/rest-articles/app/service"
 	domain "github.com/TudorHulban/rest-articles/domain/article"
 	"github.com/TudorHulban/rest-articles/infra/db"
 	repository "github.com/TudorHulban/rest-articles/infra/repository/postgres"
+	"github.com/TudorHulban/rest-articles/infra/rest"
+	"github.com/TudorHulban/rest-articles/infra/web"
 	"github.com/gofiber/fiber/v2/utils"
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
@@ -33,27 +34,27 @@ func TestHandlers(t *testing.T) {
 
 	require.NoError(repo.Migration(&domain.Article{}))
 
-	service, errServ := service.NewService(repo)
-	require.NoError(errServ)
+	crud, errREST := rest.NewREST(repo)
+	require.NoError(errREST)
 
-	web, errWeb := NewWebServer(3000, service)
+	web, errWeb := web.NewWebServer(3000, crud)
 	require.NoError(errWeb)
 
 	defer web.Stop()
 
-	web.addRoutes()
+	web.AddRoutes()
 
 	title := "The Title"
 	urlCreate := "http://initial.abc.eu"
 
-	resp, errBadReq := web.app.Test(httptest.NewRequest(http.MethodGet, _routeItem+"/abc", nil))
+	resp, errBadReq := web.App.Test(httptest.NewRequest(http.MethodGet, rest.RouteItem+"/abc", nil))
 	utils.AssertEqual(t, nil, errBadReq)
 	utils.AssertEqual(t, http.StatusBadRequest, resp.StatusCode)
 
-	reqCreate := httptest.NewRequest(http.MethodPost, _routeItem, strings.NewReader(fmt.Sprintf(_itemCreate, title, urlCreate)))
+	reqCreate := httptest.NewRequest(http.MethodPost, rest.RouteItem, strings.NewReader(fmt.Sprintf(_itemCreate, title, urlCreate)))
 	reqCreate.Header.Set("Content-type", "application/json")
 
-	respPOST, errPOST := web.app.Test(reqCreate)
+	respPOST, errPOST := web.App.Test(reqCreate)
 	utils.AssertEqual(t, nil, errPOST)
 	utils.AssertEqual(t, http.StatusOK, respPOST.StatusCode)
 
@@ -67,7 +68,7 @@ func TestHandlers(t *testing.T) {
 	insertID := gjson.Get(string(bodyID), "id").String()
 	t.Logf("insertID:%s", insertID)
 
-	respItem, errGET := web.app.Test(httptest.NewRequest(http.MethodGet, _routeItem+"/"+insertID, nil))
+	respItem, errGET := web.App.Test(httptest.NewRequest(http.MethodGet, rest.RouteItem+"/"+insertID, nil))
 	t.Logf("GET:\n%v", respItem)
 
 	utils.AssertEqual(t, nil, errGET)
@@ -84,11 +85,11 @@ func TestHandlers(t *testing.T) {
 
 	urlUpdate := "http://updated.abc.eu"
 
-	reqUpdate := httptest.NewRequest(http.MethodPut, _routeItem+"/"+insertID, strings.NewReader(fmt.Sprintf(_itemUpdate, urlUpdate)))
+	reqUpdate := httptest.NewRequest(http.MethodPut, rest.RouteItem+"/"+insertID, strings.NewReader(fmt.Sprintf(_itemUpdate, urlUpdate)))
 
 	reqCreate.Header.Set("Content-type", "application/json")
 
-	respPUT, errPUT := web.app.Test(reqUpdate)
+	respPUT, errPUT := web.App.Test(reqUpdate)
 	t.Logf("PUT:\n%v", *respPUT)
 
 	defer respPUT.Body.Close()
@@ -102,7 +103,7 @@ func TestHandlers(t *testing.T) {
 	utils.AssertEqual(t, nil, errPUT)
 	utils.AssertEqual(t, http.StatusOK, respPUT.StatusCode)
 
-	respUpdated, errUpdated := web.app.Test(httptest.NewRequest(http.MethodGet, _routeItem+"/"+insertID, nil))
+	respUpdated, errUpdated := web.App.Test(httptest.NewRequest(http.MethodGet, rest.RouteItem+"/"+insertID, nil))
 	t.Logf("GET:\n%v", respUpdated)
 
 	utils.AssertEqual(t, nil, errUpdated)
@@ -117,11 +118,11 @@ func TestHandlers(t *testing.T) {
 	require.Equal(title, gjson.Get(string(bodyUpdated), "article.title").String())
 	require.Equal(urlUpdate, gjson.Get(string(bodyUpdated), "article.url").String())
 
-	respDel, errDel := web.app.Test(httptest.NewRequest(http.MethodDelete, _routeItem+"/"+insertID, nil))
+	respDel, errDel := web.App.Test(httptest.NewRequest(http.MethodDelete, rest.RouteItem+"/"+insertID, nil))
 	utils.AssertEqual(t, nil, errDel)
 	utils.AssertEqual(t, 200, respDel.StatusCode)
 
-	respItemDeleted, errGETDeleted := web.app.Test(httptest.NewRequest(http.MethodGet, _routeItem+"/"+insertID, nil))
+	respItemDeleted, errGETDeleted := web.App.Test(httptest.NewRequest(http.MethodGet, rest.RouteItem+"/"+insertID, nil))
 	t.Logf("GET:\n%v", respItemDeleted)
 	t.Logf("Error DELETE response:\n%s", errGETDeleted)
 

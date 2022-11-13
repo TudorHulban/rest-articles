@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/TudorHulban/rest-articles/app/apperrors"
-	domain "github.com/TudorHulban/rest-articles/domain/article"
 	"github.com/TudorHulban/rest-articles/infra/db"
 	repository "github.com/TudorHulban/rest-articles/infra/repository/postgres"
 	"github.com/stretchr/testify/require"
@@ -25,7 +24,8 @@ func TestServiceArticle(t *testing.T) {
 
 	repo, errRepo := repository.NewRepository(db)
 	require.NoError(t, errRepo)
-	require.NoError(t, repo.Migration(&domain.Article{}))
+	// TODO: add more refined mechanism to check if migrations are needed to run
+	// require.NoError(t, repo.Migration(&domain.Article{}))
 
 	serv, errServ := NewService(repo)
 	require.NoError(t, errServ)

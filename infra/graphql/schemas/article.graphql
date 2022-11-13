@@ -1,0 +1,17 @@
+type Article {
+  id: Int!
+  title: String!
+  url: String!
+}
+
+type Mutation {
+  UpdateArticleTitle(id: Int!, title:String!): Int!
+}
+
+type Mutation {
+  UpdateArticleURL(id: Int!, url:String!): Int!
+}
+
+type Query {
+    GetArticle(id: Int!): Article
+}

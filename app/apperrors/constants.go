@@ -21,5 +21,6 @@ var (
 	OSExitForRepositoryIssues           = 2
 	OSExitForRepositoryMigrationsIssues = 3
 	OSExitForServiceIssues              = 4
-	OSExitForWebServerIssues            = 5
+	OSExitForRESTIssues                 = 5
+	OSExitForWebServerIssues            = 6
 )

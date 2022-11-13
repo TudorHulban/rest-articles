@@ -12,7 +12,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func (s *WebServer) handleAlive() fiber.Handler {
+func (rest *Rest) HandlerAlive() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		return c.Status(http.StatusOK).JSON(&fiber.Map{
 			"alive": true,
@@ -20,7 +20,7 @@ func (s *WebServer) handleAlive() fiber.Handler {
 	}
 }
 
-func (s *WebServer) handleNewArticle() fiber.Handler {
+func (rest *Rest) HandlerNewArticle() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		type request struct {
 			Title string `json:"title"`
@@ -36,7 +36,7 @@ func (s *WebServer) handleNewArticle() fiber.Handler {
 			})
 		}
 
-		idInsert, errIns := s.serv.CreateArticle(c.Context(), &service.ParamsCreateArticle{
+		idInsert, errIns := rest.serv.CreateArticle(c.Context(), &service.ParamsCreateArticle{
 			Title: req.Title,
 			URL:   req.URL,
 		})
@@ -54,7 +54,7 @@ func (s *WebServer) handleNewArticle() fiber.Handler {
 	}
 }
 
-func (s *WebServer) handleGetArticle() fiber.Handler {
+func (rest *Rest) HandlerGetArticle() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		idRequest := c.Params("id")
 
@@ -73,7 +73,7 @@ func (s *WebServer) handleGetArticle() fiber.Handler {
 			})
 		}
 
-		reconstructedItem, errFetch := s.serv.GetArticle(c.Context(), int64(idItem))
+		reconstructedItem, errFetch := rest.serv.GetArticle(c.Context(), int64(idItem))
 		if errFetch != nil {
 			if errors.Is(errFetch, apperrors.ErrObjectNotFound{}) {
 				return c.Status(http.StatusOK).JSON(&fiber.Map{
@@ -96,9 +96,9 @@ func (s *WebServer) handleGetArticle() fiber.Handler {
 }
 
 // handleGetArticles - no pagination
-func (s *WebServer) handleGetArticles() fiber.Handler {
+func (rest *Rest) HandlerGetArticles() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		items, errReq := s.serv.GetArticles(c.Context())
+		items, errReq := rest.serv.GetArticles(c.Context())
 		if errReq != nil {
 			return c.Status(http.StatusInternalServerError).JSON(&fiber.Map{
 				"success": false,
@@ -114,7 +114,7 @@ func (s *WebServer) handleGetArticles() fiber.Handler {
 }
 
 // handleGetArticlesWithPagination
-func (s *WebServer) handleGetArticlesWithPagination() fiber.Handler {
+func (rest *Rest) HandlerGetArticlesWithPagination() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		limit := c.Query("limit")
 		page := c.Query("page")
@@ -122,7 +122,7 @@ func (s *WebServer) handleGetArticlesWithPagination() fiber.Handler {
 		nLimit, _ := strconv.Atoi(limit)
 		nPage, _ := strconv.Atoi(page)
 
-		paginatedItems, errReq := s.serv.GetArticlesPaginated(c.Context(), nLimit, nPage)
+		paginatedItems, errReq := rest.serv.GetArticlesPaginated(c.Context(), nLimit, nPage)
 		if errReq != nil {
 			return c.Status(http.StatusInternalServerError).JSON(&fiber.Map{
 				"success": false,
@@ -137,7 +137,7 @@ func (s *WebServer) handleGetArticlesWithPagination() fiber.Handler {
 	}
 }
 
-func (s *WebServer) handleUpdateArticle() fiber.Handler {
+func (rest *Rest) HandlerUpdateArticle() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		idRequest := c.Params("id")
 
@@ -186,7 +186,7 @@ func (s *WebServer) handleUpdateArticle() fiber.Handler {
 			URL:   &req.URL,
 		}
 
-		if errUpd := s.serv.UpdateArticle(c.Context(), &params); errUpd != nil {
+		if errUpd := rest.serv.UpdateArticle(c.Context(), &params); errUpd != nil {
 			return c.Status(http.StatusBadRequest).JSON(&fiber.Map{
 				"success": false,
 				"error":   errUpd.Error(),
@@ -199,7 +199,7 @@ func (s *WebServer) handleUpdateArticle() fiber.Handler {
 	}
 }
 
-func (s *WebServer) handleDeleteArticle() fiber.Handler {
+func (rest *Rest) HandlerDeleteArticle() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		idRequest := c.Params("id")
 
@@ -218,7 +218,7 @@ func (s *WebServer) handleDeleteArticle() fiber.Handler {
 			})
 		}
 
-		if errDel := s.serv.DeleteArticle(c.Context(), int64(idItem)); errDel != nil {
+		if errDel := rest.serv.DeleteArticle(c.Context(), int64(idItem)); errDel != nil {
 			return c.Status(http.StatusBadRequest).JSON(&fiber.Map{
 				"success": false,
 				"error":   errDel.Error(),

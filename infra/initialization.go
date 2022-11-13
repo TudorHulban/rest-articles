@@ -9,9 +9,10 @@ import (
 	"github.com/TudorHulban/rest-articles/infra/db"
 	repository "github.com/TudorHulban/rest-articles/infra/repository/postgres"
 	"github.com/TudorHulban/rest-articles/infra/rest"
+	"github.com/TudorHulban/rest-articles/infra/web"
 )
 
-func Initialize() (*rest.WebServer, *apperrors.ErrorApplication) {
+func Initialize() (*web.WebServer, *apperrors.ErrorApplication) {
 	errorApp := apperrors.ErrorApplication{
 		Area: apperrors.Areas[apperrors.ErrorAreaInfra],
 	}
@@ -48,7 +49,15 @@ func Initialize() (*rest.WebServer, *apperrors.ErrorApplication) {
 		return nil, &errorApp
 	}
 
-	web, errWeb := rest.NewWebServer(3000, service)
+	crud, errREST := rest.NewRESTWService(service)
+	if errREST != nil {
+		errorApp.AreaError = fmt.Errorf(apperrors.ErrorMsgRESTCreation, errServ)
+		errorApp.OSExit = &apperrors.OSExitForRESTIssues
+
+		return nil, &errorApp
+	}
+
+	web, errWeb := web.NewWebServer(3000, crud)
 	if errWeb != nil {
 		errorApp.AreaError = fmt.Errorf(apperrors.ErrorMsgWebServerCreation, errServ)
 		errorApp.OSExit = &apperrors.OSExitForWebServerIssues
