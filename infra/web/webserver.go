@@ -4,23 +4,45 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/TudorHulban/rest-articles/app/service"
+	"github.com/TudorHulban/rest-articles/infra/graphql/resolvers"
 	"github.com/TudorHulban/rest-articles/infra/rest"
 	"github.com/gofiber/fiber/v2"
 )
 
 type WebServer struct {
-	App  *fiber.App
-	rest *rest.Rest
+	App      *fiber.App
+	rest     *rest.Rest
+	resolver *resolvers.Resolver
 
 	errShutdown error
 	port        uint
 }
 
-func NewWebServer(port uint, rest *rest.Rest) (*WebServer, error) {
+func NewWebServerREST(port uint, rest *rest.Rest) (*WebServer, error) {
 	return &WebServer{
 		App:  fiber.New(),
 		port: port,
 		rest: rest,
+	}, nil
+}
+
+func NewWebServerWService(port uint, serv *service.Service) (*WebServer, error) {
+	crud, errREST := rest.NewRESTWService(serv)
+	if errREST != nil {
+		return nil, errREST
+	}
+
+	graphq, errGraphql := resolvers.NewResolverWService(serv)
+	if errGraphql != nil {
+		return nil, errGraphql
+	}
+
+	return &WebServer{
+		App:      fiber.New(),
+		port:     port,
+		rest:     crud,
+		resolver: graphq,
 	}, nil
 }
 

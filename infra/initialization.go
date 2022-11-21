@@ -57,7 +57,7 @@ func Initialize() (*web.WebServer, *apperrors.ErrorApplication) {
 		return nil, &errorApp
 	}
 
-	web, errWeb := web.NewWebServer(3000, crud)
+	web, errWeb := web.NewWebServerREST(3000, crud)
 	if errWeb != nil {
 		errorApp.AreaError = fmt.Errorf(apperrors.ErrorMsgWebServerCreation, errServ)
 		errorApp.OSExit = &apperrors.OSExitForWebServerIssues

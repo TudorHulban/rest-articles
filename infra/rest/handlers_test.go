@@ -37,7 +37,7 @@ func TestHandlers(t *testing.T) {
 	crud, errREST := rest.NewREST(repo)
 	require.NoError(errREST)
 
-	web, errWeb := web.NewWebServer(3000, crud)
+	web, errWeb := web.NewWebServerREST(3000, crud)
 	require.NoError(errWeb)
 
 	defer web.Stop()

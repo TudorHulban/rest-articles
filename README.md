@@ -1,8 +1,11 @@
 # rest-articles (MVP)
+
 ## Introduction
+
 The repository contains functionality that serves interacting with an Article object.  
 The Article, with plural Articles, is an object with title and URL as properties.   
 The object is defined as:
+
 ```go
 type Article struct {
 	Title string `db:"title" json:"title"`
@@ -14,12 +17,16 @@ type Article struct {
 	DeletedOn *time.Time `db:"deleted_on" json:"-"`
 }
 ```
+
 An Article has an ID primary key, and tags for JSON and database purposes are introduced.  The ID field is not placed as first in the structure for memory allignment reasons. Unicity indexes were not placed on title or URL due to time constraints.   
 An Article can be persisted using a PostgreSQL repository and served to a transport by the application service. The curent transport is done as REST with the Fiber web framework.  
 Appication configuration is limited to database name and host due to time constraints.  
 Managing the application can be done using the make targets defined.
+
 ## Error Handling
-The app mainly uses an error type as below with error messages concentrated in an error package. 
+
+The app mainly uses an error type as below with error messages concentrated in an error package.
+
 ```go
 type ErrorApplication struct {
 	Area      ErrorArea
@@ -29,6 +36,7 @@ type ErrorApplication struct {
 }
 ```
 In each area helpers should exist, example:
+
 ```go
 func (repo *Repository) Errors(repoError error) *apperrors.ErrorApplication {
 	return &apperrors.ErrorApplication{
@@ -43,36 +51,67 @@ func (repo *Repository) ErrorsWCode(code string, repoError error) *apperrors.Err
 	}
 }
 ```
+
 This approach should improve:  
 a. the understanding of the application as high level information about the application areas is concentrated in one package  
 b. error messages updates as there is only one place which offers a full view of the errors  
 c. documentation as the app errors package can be easily shared with other teams
+
 ## Logging
+
 Was not added due to time constraints.
-## Open API 
+
+## Open API
+
 Was not added due to time constraints.
+
+## REST
+
+## GraphQL
+
+Schema was created in `infra/graphql/schemas`.  
+Any updates on the schema should be followed by a
+
+```sh
+go run github.com/99designs/gqlgen generate
+```
+
+run in the schema folder.
+
 ## Unit testing
+
 ### Prerequisites
+
 Go starting with version 1.19.  
 Docker Compose starting with version 3.9.
+
 ### Start the database container
+
 ```sh
 make database-unit
 ```
+
 ### Run unit tests
+
 ```sh
 make test
 ```
+
 ## Run
+
 Perform clean up if unit testing was done with:
 ```sh
 make infra-cleanup
 ```
+
 Run:
+
 ```sh
 make run
 ```
+
 ### Endpoints
+
 Below endpoints would be available on run:
 | Endpoint URL |HTTP Verb |Info |
 | --------------- | --------------- |------|

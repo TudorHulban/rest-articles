@@ -6,9 +6,6 @@ type Article {
 
 type Mutation {
   UpdateArticleTitle(id: Int!, title:String!): Int!
-}
-
-type Mutation {
   UpdateArticleURL(id: Int!, url:String!): Int!
 }
 
