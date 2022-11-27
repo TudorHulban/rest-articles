@@ -145,5 +145,5 @@ func (s *Service) DeleteArticle(ctx context.Context, id int64) error {
 }
 
 func (s *Service) Stop() error {
-	return db.Close()
+	return db.CloseDBConnection()
 }

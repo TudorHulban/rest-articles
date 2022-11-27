@@ -38,7 +38,11 @@ func (repo *Repository) ErrorsWCode(code string, repoError error) *apperrors.Err
 }
 
 func (repo *Repository) Migration(model any) error {
-	return repo.DBConn.AutoMigrate(model)
+	if !repo.DBConn.Migrator().HasTable(model) {
+		return repo.DBConn.AutoMigrate(model)
+	}
+
+	return nil
 }
 
 func (repo *Repository) CreateOne(ctx context.Context, item *domain.Article) (int64, error) {

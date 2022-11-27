@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-type configDB struct {
+type configPostgresDB struct {
 	Name     string
 	User     string
 	Password string
@@ -18,8 +18,8 @@ type configDB struct {
 	Port     int
 }
 
-func newTestConfigDB() configDB {
-	return configDB{
+func newConfigPostgresDB() configPostgresDB {
+	return configPostgresDB{
 		Name:     configs.GetDatabaseName(),
 		User:     "postgres",
 		Password: "thepassword",
@@ -28,7 +28,7 @@ func newTestConfigDB() configDB {
 	}
 }
 
-func connect(cfg configDB) (*gorm.DB, error) {
+func connectDBPostgres(cfg configPostgresDB) (*gorm.DB, error) {
 	dsn := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		cfg.Host,
