@@ -78,6 +78,26 @@ go run github.com/99designs/gqlgen generate
 
 run in the schema folder.
 
+### Query articles
+
+```json
+{
+    GetArticle(id:1) {
+    id
+    title
+    url
+  }
+}
+```
+
+### Update Article
+
+```json
+mutation {
+  UpdateArticleTitle(id: 1, title: "new title")
+}
+```
+
 ## Unit testing
 
 ### Prerequisites
@@ -176,6 +196,7 @@ Status code distribution:
 
 
 ## Resources
+
 ```html
 https://www.baeldung.com/ops/docker-compose
 https://firehydrant.com/blog/develop-a-go-app-with-docker-compose/
@@ -184,4 +205,5 @@ https://golangbot.com/mysql-create-table-insert-row/
 https://dev.to/devsmranjan/golang-build-your-first-rest-api-with-fiber-24eh
 https://dev.to/rafaelgfirmino/pagination-using-gorm-scopes-3k5f
 https://www.jajaldoang.com/post/golang-function-timeout-with-context/
+https://stackoverflow.com/questions/62348857/unit-testing-graphql-in-golang
 ```

@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/TudorHulban/rest-articles/app/apperrors"
 	"github.com/TudorHulban/rest-articles/app/service"
 	"github.com/TudorHulban/rest-articles/infra/graphql/generated"
 	"github.com/TudorHulban/rest-articles/infra/graphql/resolvers"
@@ -66,12 +67,25 @@ func NewWebServerWServiceAndGraphql(port uint, serv *service.Service) (*WebServe
 	}, nil
 }
 
+func (s *WebServer) Errors(repoError error) *apperrors.ErrorApplication {
+	return &apperrors.ErrorApplication{
+		Area: apperrors.Areas[apperrors.ErrorAreaWebServer],
+	}
+}
+
+func (s *WebServer) ErrorsWCode(code string, repoError error) *apperrors.ErrorApplication {
+	return &apperrors.ErrorApplication{
+		Area: apperrors.Areas[apperrors.ErrorAreaWebServer],
+		Code: code,
+	}
+}
+
 func (s *WebServer) Start() error {
 	s.AddRESTRoutes()
 
 	if s.withGraphql {
 		if errGra := s.AddGraphql(); errGra != nil {
-			return errGra
+			return s.Errors(errGra)
 		}
 	}
 
@@ -82,7 +96,7 @@ func (s *WebServer) Start() error {
 	if s.errShutdown != nil {
 		fmt.Printf("start - stopped now: %s\n", s.errShutdown)
 
-		return s.errShutdown
+		return s.Errors(s.errShutdown)
 	}
 
 	fmt.Println("start - stopped now: no error")
@@ -90,7 +104,7 @@ func (s *WebServer) Start() error {
 	return nil
 }
 
-// Stop relases web server and service.
+// Stop releases web server and service.
 // Returns closing errors from web and service.
 func (s *WebServer) Stop() (error, error) {
 	fmt.Println("stopping Fiber")
@@ -103,13 +117,13 @@ func (s *WebServer) Stop() (error, error) {
 		errWebClose = errShut
 	}
 
-	return errWebClose, errServiceClose
+	return s.Errors(errWebClose), s.Errors(errServiceClose)
 }
 
 func (s *WebServer) AddGraphql() error {
 	graphqlResolver, errGraphql := resolvers.NewResolverWService(s.serv)
 	if errGraphql != nil {
-		return errGraphql
+		return s.ErrorsWCode(apperrors.ErrorGraphqlCODE, errGraphql)
 	}
 
 	server := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{

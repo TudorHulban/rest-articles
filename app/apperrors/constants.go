@@ -2,7 +2,7 @@ package apperrors
 
 const (
 	ErrorAreaInfra = iota + 1
-	ErrorAreaWeb
+	ErrorAreaWebServer
 	ErrorAreaService
 	ErrorAreaRepository
 )
@@ -11,7 +11,7 @@ const ErrorMsgForContextExpiration = "context expired"
 
 var Areas = map[int]ErrorArea{
 	1: ErrorArea("INFRA"),
-	2: ErrorArea("WEB"),
+	2: ErrorArea("WEBSERVER"),
 	3: ErrorArea("SERVICE"),
 	4: ErrorArea("REPOSITORY"),
 }

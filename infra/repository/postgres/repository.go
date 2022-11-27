@@ -49,7 +49,7 @@ func (repo *Repository) CreateOne(ctx context.Context, item *domain.Article) (in
 	callDatabase := func() (int64, error) {
 		errInsert := repo.DBConn.Create(item).Error
 
-		return item.ID, errInsert
+		return item.ID, repo.Errors(errInsert)
 	}
 
 	callDone := make(chan bool)
@@ -68,7 +68,7 @@ func (repo *Repository) CreateOne(ctx context.Context, item *domain.Article) (in
 		return 0, repo.Errors(fmt.Errorf("Find:%w", errors.New(apperrors.ErrorMsgForContextExpiration)))
 
 	case <-callDone:
-		return res, errCall
+		return res, repo.Errors(errCall)
 	}
 }
 
@@ -95,7 +95,7 @@ func (repo *Repository) Find(ctx context.Context, id int64) (*domain.Article, er
 
 		if tx.Error != nil {
 			if tx.Error.Error() == "record not found" {
-				return nil, apperrors.ErrObjectNotFound{}
+				return nil, repo.Errors(apperrors.ErrObjectNotFound{})
 			}
 
 			return nil, tx.Error
@@ -124,7 +124,7 @@ func (repo *Repository) Find(ctx context.Context, id int64) (*domain.Article, er
 		return nil, repo.Errors(fmt.Errorf("Find:%w", errors.New(apperrors.ErrorMsgForContextExpiration)))
 
 	case <-callDone:
-		return res, errCall
+		return res, repo.Errors(errCall)
 	}
 }
 
@@ -159,7 +159,7 @@ func (repo *Repository) FindAll(ctx context.Context) (*domain.Articles, error) {
 		return nil, repo.Errors(fmt.Errorf("Find:%w", errors.New(apperrors.ErrorMsgForContextExpiration)))
 
 	case <-callDone:
-		return res, errCall
+		return res, repo.Errors(errCall)
 	}
 }
 
@@ -195,7 +195,7 @@ func (repo *Repository) FindAllPaginated(ctx context.Context, paginator *Paginat
 		return nil, repo.Errors(fmt.Errorf("Find:%w", errors.New(apperrors.ErrorMsgForContextExpiration)))
 
 	case <-callDone:
-		return res, errCall
+		return res, repo.Errors(errCall)
 	}
 }
 
@@ -225,6 +225,6 @@ func (repo *Repository) Update(ctx context.Context, item *domain.Article) error 
 		return repo.Errors(fmt.Errorf("Find:%w", errors.New(apperrors.ErrorMsgForContextExpiration)))
 
 	case <-callDone:
-		return errCall
+		return repo.Errors(errCall)
 	}
 }
