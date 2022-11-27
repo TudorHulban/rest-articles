@@ -2,18 +2,23 @@ package web
 
 import (
 	"fmt"
+	"net/http"
 	"strconv"
 
+	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/TudorHulban/rest-articles/app/service"
+	"github.com/TudorHulban/rest-articles/infra/graphql/generated"
 	"github.com/TudorHulban/rest-articles/infra/graphql/resolvers"
 	"github.com/TudorHulban/rest-articles/infra/rest"
 	"github.com/gofiber/fiber/v2"
+	"github.com/valyala/fasthttp/fasthttpadaptor"
 )
 
 type WebServer struct {
-	App      *fiber.App
-	rest     *rest.Rest
-	resolver *resolvers.Resolver
+	App *fiber.App
+
+	serv *service.Service
+	rest *rest.Rest
 
 	errShutdown error
 	port        uint
@@ -33,21 +38,15 @@ func NewWebServerWService(port uint, serv *service.Service) (*WebServer, error) 
 		return nil, errREST
 	}
 
-	graphq, errGraphql := resolvers.NewResolverWService(serv)
-	if errGraphql != nil {
-		return nil, errGraphql
-	}
-
 	return &WebServer{
-		App:      fiber.New(),
-		port:     port,
-		rest:     crud,
-		resolver: graphq,
+		App:  fiber.New(),
+		port: port,
+		rest: crud,
 	}, nil
 }
 
 func (s *WebServer) Start() {
-	s.AddRoutes()
+	s.AddRESTRoutes()
 
 	fmt.Println("web server started")
 
@@ -60,6 +59,12 @@ func (s *WebServer) Start() {
 	}
 
 	fmt.Println("start - stopped now: no error")
+}
+
+func (s *WebServer) StartWGraphql() {
+	s.AddGraphql()
+
+	s.Start()
 }
 
 // Stop relases web server and service.
@@ -78,7 +83,30 @@ func (s *WebServer) Stop() (error, error) {
 	return errWebClose, errServiceClose
 }
 
-func (s *WebServer) AddRoutes() {
+func (s *WebServer) AddGraphql() error {
+	graphqlResolver, errGraphql := resolvers.NewResolverWService(s.serv)
+	if errGraphql != nil {
+		return errGraphql
+	}
+
+	server := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{
+		Resolvers: graphqlResolver,
+	}))
+
+	graphqlHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		server.ServeHTTP(w, r)
+	})
+
+	s.App.All(_RouteGraphql, func(c *fiber.Ctx) error {
+		fasthttpadaptor.NewFastHTTPHandler(graphqlHandler)(c.Context())
+
+		return nil
+	})
+
+	return nil
+}
+
+func (s *WebServer) AddRESTRoutes() {
 	s.App.Post(rest.RouteItem, s.rest.HandlerNewArticle())
 	s.App.Get(rest.RouteItem+"/:id", s.rest.HandlerGetArticle())
 	s.App.Put(rest.RouteItem+"/:id", s.rest.HandlerUpdateArticle())

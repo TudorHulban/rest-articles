@@ -42,7 +42,7 @@ func TestHandlers(t *testing.T) {
 
 	defer web.Stop()
 
-	web.AddRoutes()
+	web.AddRESTRoutes()
 
 	title := "The Title"
 	urlCreate := "http://initial.abc.eu"
