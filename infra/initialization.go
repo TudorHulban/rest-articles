@@ -8,7 +8,6 @@ import (
 	domain "github.com/TudorHulban/rest-articles/domain/article"
 	"github.com/TudorHulban/rest-articles/infra/db"
 	repository "github.com/TudorHulban/rest-articles/infra/repository/postgres"
-	"github.com/TudorHulban/rest-articles/infra/rest"
 	"github.com/TudorHulban/rest-articles/infra/web"
 )
 
@@ -49,15 +48,7 @@ func Initialize() (*web.WebServer, *apperrors.ErrorApplication) {
 		return nil, &errorApp
 	}
 
-	crud, errREST := rest.NewRESTWService(service)
-	if errREST != nil {
-		errorApp.AreaError = fmt.Errorf(apperrors.ErrorMsgRESTCreation, errServ)
-		errorApp.OSExit = &apperrors.OSExitForRESTIssues
-
-		return nil, &errorApp
-	}
-
-	web, errWeb := web.NewWebServerREST(3000, crud)
+	web, errWeb := web.NewWebServerWServiceAndGraphql(3000, service)
 	if errWeb != nil {
 		errorApp.AreaError = fmt.Errorf(apperrors.ErrorMsgWebServerCreation, errServ)
 		errorApp.OSExit = &apperrors.OSExitForWebServerIssues

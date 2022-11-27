@@ -1,6 +1,7 @@
 package web
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -17,8 +18,9 @@ import (
 type WebServer struct {
 	App *fiber.App
 
-	serv *service.Service
-	rest *rest.Rest
+	serv        *service.Service
+	rest        *rest.Rest
+	withGraphql bool
 
 	errShutdown error
 	port        uint
@@ -45,8 +47,33 @@ func NewWebServerWService(port uint, serv *service.Service) (*WebServer, error) 
 	}, nil
 }
 
-func (s *WebServer) Start() {
+func NewWebServerWServiceAndGraphql(port uint, serv *service.Service) (*WebServer, error) {
+	if serv == nil {
+		return nil, errors.New("NewWebServerWServiceAndGraphql: passed service is nil")
+	}
+
+	crud, errREST := rest.NewRESTWService(serv)
+	if errREST != nil {
+		return nil, errREST
+	}
+
+	return &WebServer{
+		App:         fiber.New(),
+		port:        port,
+		rest:        crud,
+		serv:        serv,
+		withGraphql: true,
+	}, nil
+}
+
+func (s *WebServer) Start() error {
 	s.AddRESTRoutes()
+
+	if s.withGraphql {
+		if errGra := s.AddGraphql(); errGra != nil {
+			return errGra
+		}
+	}
 
 	fmt.Println("web server started")
 
@@ -55,16 +82,12 @@ func (s *WebServer) Start() {
 	if s.errShutdown != nil {
 		fmt.Printf("start - stopped now: %s\n", s.errShutdown)
 
-		return
+		return s.errShutdown
 	}
 
 	fmt.Println("start - stopped now: no error")
-}
 
-func (s *WebServer) StartWGraphql() {
-	s.AddGraphql()
-
-	s.Start()
+	return nil
 }
 
 // Stop relases web server and service.
@@ -102,6 +125,8 @@ func (s *WebServer) AddGraphql() error {
 
 		return nil
 	})
+
+	fmt.Println("Graphql support added")
 
 	return nil
 }

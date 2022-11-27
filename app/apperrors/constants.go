@@ -23,4 +23,5 @@ var (
 	OSExitForServiceIssues              = 4
 	OSExitForRESTIssues                 = 5
 	OSExitForWebServerIssues            = 6
+	OSExitForGraphqlIssues              = 7
 )

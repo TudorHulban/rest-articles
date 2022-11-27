@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/TudorHulban/rest-articles/app/apperrors"
 	"github.com/TudorHulban/rest-articles/infra"
 )
 
@@ -27,5 +28,9 @@ func main() {
 		}
 	}()
 
-	web.Start()
+	if errStart := web.Start(); errStart != nil {
+		fmt.Println(errStart)
+
+		os.Exit(apperrors.OSExitForGraphqlIssues)
+	}
 }
